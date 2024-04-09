@@ -1,9 +1,6 @@
 # Opportunistic Federated Learning - Experiments
 
-A customized Alchemist Primer with releases and data analysis ready.
-
-Upon generation of an experiment from this template:
-5. edit the DockerHub password in `.github/workflows/build-and-deploy.yml`;
+> Provide a brief description of the experiments here.
 
 ## Reproduce the entire experiment
 
