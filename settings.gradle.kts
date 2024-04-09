@@ -11,4 +11,4 @@ gradleEnterprise {
     }
 }
 
-rootProject.name = "alchemist-experiments-bootstrap"
+rootProject.name = "experiments-opportunistic-federated-learning"
