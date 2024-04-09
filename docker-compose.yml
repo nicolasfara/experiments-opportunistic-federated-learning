@@ -13,7 +13,7 @@ services:
         chmod 777 /experiment/charts
   simulation:
     environment:
-      CI: false
+      CI: "false"
     depends_on:
       prepare:
         condition: service_completed_successfully
