@@ -1,3 +1,29 @@
+## 1.0.0 (2024-04-10)
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v33.0.7 ([fb89f5a](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/fb89f5a5040a7310bdb26bd6e32c3cc5ebfd0614))
+* **deps:** update plugin com.gradle.enterprise to v3.17.1 ([1dd6035](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/1dd6035843845f5ee2fd3f51689c90c409dc0bdd))
+
+
+### Documentation
+
+* improve readme ([fc2ffc7](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/fc2ffc7bbe633dce3c55155e93552e85ef1ecfb7))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.13 ([0d5a097](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/0d5a097d933a035154d725b91be7a697ce706001))
+* set CI variable to true when testing docker-compose in CI ([ee8b468](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/ee8b468369235d0624ab573e409eb180802d255c))
+
+
+### General maintenance
+
+* quote variable content ([1c8e979](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/1c8e9795f11a5d3bdeb6330c55ce2c970451be2a))
+* setup CI variable to false by default ([d4c013e](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/d4c013ec34bba9378d4b20c98484b53778184a5b))
+* setup experiment repository ([a875ce1](https://github.com/nicolasfara/experiments-opportunistic-federated-learning/commit/a875ce1a989adbd851ec61876ea8cd9b408d440e))
+
 ## [1.2.1](https://github.com/DanySK/alchemist-experiments-bootstrap/compare/1.2.0...1.2.1) (2024-02-09)
 
 
