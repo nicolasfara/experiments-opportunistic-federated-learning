@@ -1,3 +1,43 @@
+## [1.1.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.0.0...1.1.0) (2024-04-12)
+
+
+### Features
+
+* add cnn model ([6fd4b6f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/6fd4b6f725153f1aa24f3153b056cc48c20faa8b))
+* add fedavg function ([4822744](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/482274465609c6328841748cfa0e0f3b694cafbb))
+* setup python package with utility functions for FL ([408b3fe](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/408b3fe9a2247769a4314331f106381aadd37d14))
+* setup simulation environment ([b3cf5a6](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b3cf5a69f789c7cf2ff9f8762bb3878bdfcf5b09))
+
+
+### Dependency updates
+
+* **deps:** update python docker tag to v3.12.3 ([23304a8](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/23304a8ca8e705b6827a731f0eac7dbc8a7872ba))
+
+
+### Documentation
+
+* add some description of experiments ([504cd08](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/504cd08c1eae8cd31165a05e9ff2b3839fa97c8a))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.14 ([b99f0ff](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b99f0ff48e64ae0a942182f392098d343188d16f))
+* move to develocity ([d01c1d3](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d01c1d3e4ae091ffe6809232e04995caac998085))
+
+
+### General maintenance
+
+* add scalafmt basic config ([5cc781c](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/5cc781c40ff81a7d3cec19d074631934b3fe255d))
+* **docker:** downgrade version to 17 since scala reflect fails on java 21 ([1a9fa29](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/1a9fa290c1b561b17cbae9c4c1c40634419275b5))
+* draft for the metrics ([a195e6a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/a195e6aafa7eb93322883c62262c3a951743cebb))
+* **release:** update gradle.properties .env versions to 1.0.0 [skip ci] ([450dbc5](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/450dbc552ceb79830bdb8eff039f1fe8b08ac490))
+* update requirements ([4141d82](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4141d82e604ec4dde2965a5cf5806f8f6fe2ba24))
+
+
+### Style improvements
+
+* reformat according to scalafmt ([657ca66](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/657ca66d582f04dbaf66432a6379a180054094cb))
+
 ## 1.0.0 (2024-04-10)
 
 
