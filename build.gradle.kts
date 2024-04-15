@@ -77,6 +77,7 @@ val runAllBatch by tasks.register<DefaultTask>("runAllBatch") {
     group = alchemistGroup
     description = "Launches all experiments"
 }
+
 /*
  * Scan the folder with the simulation files, and create a task for each one of them.
  */
@@ -90,6 +91,10 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             mainClass.set("it.unibo.alchemist.Alchemist")
             classpath = sourceSets["main"].runtimeClasspath
             args("run", it.absolutePath)
+            jvmArgs(
+                if (System.getenv("CI") != "true") { "-Dscalapy.python.programname=env/bin/python" } else { "" },
+                "-Dscalapy.python.library=python3.11"
+            )
             javaLauncher.set(
                 javaToolchains.launcherFor {
                     languageVersion.set(JavaLanguageVersion.of(usesJvm))
@@ -129,3 +134,4 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
         }
         runAllBatch.dependsOn(batch)
     }
+
