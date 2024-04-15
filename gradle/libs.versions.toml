@@ -1,10 +1,12 @@
 [versions]
 alchemist = "33.0.7"
 kotlin = "1.9.23"
+scalapy = "0.5.3"
 
 [libraries]
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
 alchemist-scafi = { module = "it.unibo.alchemist:alchemist-incarnation-scafi", version.ref = "alchemist" }
+scalapy = {module = "dev.scalapy:scalapy-core_2.13", version.ref = "scalapy"}
 
 [bundles]
 alchemist = [ "alchemist", "alchemist-scafi" ]
