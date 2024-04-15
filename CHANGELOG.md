@@ -1,3 +1,25 @@
+## [1.1.1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.1.0...1.1.1) (2024-04-15)
+
+
+### Dependency updates
+
+* **deps:** update eclipse-temurin docker tag to v21 ([ebfe9db](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/ebfe9db1c88cd01e65170824712bf89918d01944))
+
+
+### Bug Fixes
+
+* **build:** use variable for jdk version instead hardcoded version ([f382215](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/f3822154849523331cea3fa285e914f0f639dba2))
+
+
+### Build and continuous integration
+
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.15 ([8adeb06](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/8adeb0616de0959d55bad1bae85b28243fed321e))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.1.0 [skip ci] ([7c8de2f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/7c8de2f6472a0327fd54373e72ed8e41673106c0))
+
 ## [1.1.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.0.0...1.1.0) (2024-04-12)
 
 
