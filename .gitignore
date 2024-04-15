@@ -4,5 +4,9 @@
 .spyproject/
 build/
 charts/
+env/
+**/dist
+**/*.egg-info
+**/__pycache__
 data_summary_*
 timeprocessed
