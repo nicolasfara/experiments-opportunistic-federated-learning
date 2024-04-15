@@ -3,7 +3,6 @@ import torch
 from torch import nn
 from torchvision import datasets, transforms
 import torch.nn.functional as F
-from sampling import dataset_to_nodes_partitioning
 import numpy as np
 
 
