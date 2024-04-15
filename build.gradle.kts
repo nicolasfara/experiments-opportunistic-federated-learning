@@ -26,7 +26,7 @@ val usesJvm: Int = File(File(projectDir, "docker/sim"), "Dockerfile")
     .toInt()
 
 multiJvm {
-    jvmVersionForCompilation.set(17)
+    jvmVersionForCompilation.set(usesJvm)
 }
 
 dependencies {
