@@ -39,3 +39,24 @@ def average_weights(models):
             w_avg[key] += models[i][key]
         w_avg[key] = torch.div(w_avg[key], len(models))
     return w_avg
+
+
+def discrepancy(weightsA, weightsB):
+    ''' Computes the discrepancy between two models
+
+    Args:
+        weightsA (state_dict): the dict containing the weights of the first model
+        weightsB (state_dict): the dict containing the weights of the second model
+
+    Returns:
+        double: the discrepancy between the two models
+    '''
+    keys = weightsA.keys()
+    S_t = len(keys)
+    d = 0
+    for key in keys:
+        w_a = weightsA[key]
+        w_b = weightsB[key]
+        norm = torch.norm(torch.sub(w_a, w_b))
+        d += norm
+    return d / S_t
