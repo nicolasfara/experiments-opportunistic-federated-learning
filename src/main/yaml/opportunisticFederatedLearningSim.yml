@@ -2,8 +2,6 @@ incarnation: scafi
 
 _constants:
   retentionTime: &retentionTime 15.0
-  longSideGrid: &longSideGrid 4
-  shortSideGrid: &shortSideGrid 3
   skewness: &skewness 0.5
 
 variables:
@@ -12,6 +10,18 @@ variables:
     max: 1
     step: 1
     default: 0
+  areas: &areas
+    type: ArbitraryVariable
+    parameters: [2, [2, 4]]
+  dataShuffle: &dataShuffle
+    type: ArbitraryVariable
+    parameters: [true, [true, false]]
+  longSideNodes: &longSideNodes
+    formula: 4
+  shortSideNodes: &shortSideNodes
+    formula: 3
+  totalNodes: &totalNodes
+    formula: longSideNodes * shortSideNodes
 
 seeds:
   scenario: *seed
@@ -29,9 +39,19 @@ _gradient: &gradient
         parameters: [it.unibo.scafi.OpportunisticFederatedLearning, *retentionTime]
   - program: send
 
+environment:
+  type: Continuous2DEnvironment
+  parameters: [ ]
+  global-programs:
+    - time-distribution:
+        type: Trigger
+        parameters: [ 0 ]
+      type: DataDistributionReaction
+      parameters: [*seed, *areas, *dataShuffle]
+
 deployments:
   type: Grid
-  parameters: [0, 0, *longSideGrid, *shortSideGrid, 1, 1, *skewness, *skewness]
+  parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
   contents:
     - in:
         type: Rectangle
