@@ -1,28 +1,31 @@
 package it.unibo.scafi
 
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
+import PythonModules._
+import me.shadaj.scalapy.py
 
 class OpportunisticFederatedLearning
     extends AggregateProgram
     with StandardSensors
     with ScafiAlchemistSupport
-    with FieldUtils {
+    with FieldUtils
+    with BuildingBlocks {
 
-  lazy val data = randomGen.nextDouble()
-  trait Model {
-    def eval(data: Double): Double
-    def diff(model: Model): Double
-  }
+  def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double =
+    utils.discrepancy(myModel, otherModule)
 
-  case class FooModel(id: ID) extends Model {
-    override def eval(data: Double): Double = data + id
-    override def diff(model: Model): Double = id
-  }
+  private val localModel = utils.cnn_factory() // TODO - implement
+
+  private val epochs = 2
+  private val discrepancyThreshold = 1.0 // TODO
 
   override def main(): Any = {
+
+    val data = utils.get_dataset(mid()) // TODO - implement
+    val aggregators = S(discrepancyThreshold, metric = () => computeMetric(localModel, nbr(localModel)))
     42
 //    val model = FooModel(mid())
-//    val models =  excludingSelf.reifyField(nbr(model))
+//    val models = excludingSelf.reifyField(nbr(model))
 //    // first metric
 //    val evaluations = models.map { case(id, model) => id -> model.eval(data) } // T
 //    val neighEvals = excludingSelf.reifyField(nbr(evaluations)).map { case(id, evals) => id -> evals(id) } // T - 1
