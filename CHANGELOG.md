@@ -1,3 +1,22 @@
+## [1.2.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.1.1...1.2.0) (2024-04-15)
+
+
+### Features
+
+* add python modules import ([dfc3b7e](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/dfc3b7e317c970369508ab682394b314e0386740))
+* **python:** implement discrepancy function ([2675473](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/2675473031cd977eae1cc329ab68ac1326ef4c08))
+
+
+### Dependency updates
+
+* **deps:** add scalapy ([32b8293](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/32b82937ae5952435f831d20c73164db41dac276))
+* **deps:** update dependency dev.scalapy:scalapy-core_2.13 to v0.5.3+2-d2eb0088 ([aab1449](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/aab14491daddb0a3c58ce548cdf9d17f8f0b0cde))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.1.1 [skip ci] ([26f7eae](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/26f7eae28f4e2cddf20fd14e8f61f85e4914b474))
+
 ## [1.1.1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.1.0...1.1.1) (2024-04-15)
 
 
