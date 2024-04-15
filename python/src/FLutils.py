@@ -104,8 +104,7 @@ def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int
         if shuffling:
             np.random.shuffle(records_per_class)
         split_record_per_node = np.array_split(records_per_class, nodes_per_area)
-        for node_index, node in enumerate(nodes):
-            index_mapping[node_index] = split_record_per_node[node_index].tolist()
+        for node in nodes:
+            index_mapping[node] = split_record_per_node[node % nodes_per_area].tolist()
 
-    print(len(index_mapping))
     return index_mapping
