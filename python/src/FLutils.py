@@ -78,9 +78,12 @@ def get_dataset(args):
                                   download=True,
                                   transform=apply_transform)
 
-    user_groups = dataset_to_nodes_partitioning(train_dataset, args['num_users'])
+    # TODO!!!
+    # I think you do not need to call this function here
+    # When you call this function `get_dataset` in args you should have the list of indexes for each user available as molecule
+    # user_groups = dataset_to_nodes_partitioning(args['num_users'], args['areas'], args['seed'])
 
-    return train_dataset, test_dataset, user_groups
+    return train_dataset, test_dataset  # , user_groups
 
 
 def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int, shuffling: bool = False):
@@ -108,3 +111,7 @@ def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int
             index_mapping[node] = split_record_per_node[node % nodes_per_area].tolist()
 
     return index_mapping
+
+
+def cnn_factory():
+    ...

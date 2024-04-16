@@ -78,6 +78,36 @@ val runAllBatch by tasks.register<DefaultTask>("runAllBatch") {
     description = "Launches all experiments"
 }
 
+val pythonVirtualEnvName = "env"
+
+val createVirtualEnv by tasks.register<Exec>("createVirtualEnv") {
+    group = alchemistGroup
+    description = "Creates a virtual environment for Python"
+    commandLine("python3", "-m", "venv", pythonVirtualEnvName)
+}
+
+val installPythonDependencies by tasks.register<Exec>("installPythonDependencies") {
+    group = alchemistGroup
+    description = "Installs Python dependencies"
+    dependsOn(createVirtualEnv)
+    commandLine("$pythonVirtualEnvName/bin/pip", "install", "-r", "requirements.txt")
+}
+
+val buildCustomDependency by tasks.register<Exec>("buildCustomDependency") {
+    group = alchemistGroup
+    description = "Builds custom Python dependencies"
+    dependsOn(installPythonDependencies)
+    workingDir("python")
+    commandLine("../$pythonVirtualEnvName/bin/python", "setup.py", "sdist", "bdist_wheel")
+}
+
+val installCustomDependency by tasks.register<Exec>("installCustomDependency") {
+    group = alchemistGroup
+    description = "Installs custom Python dependencies"
+    dependsOn(buildCustomDependency)
+    commandLine("$pythonVirtualEnvName/bin/pip", "install", "-e", "python")
+}
+
 /*
  * Scan the folder with the simulation files, and create a task for each one of them.
  */
@@ -92,7 +122,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             classpath = sourceSets["main"].runtimeClasspath
             args("run", it.absolutePath)
             jvmArgs(
-                if (System.getenv("CI") != "true") { "-Dscalapy.python.programname=env/bin/python" } else { "" },
+                "-Dscalapy.python.programname=$pythonVirtualEnvName/bin/python",
                 "-Dscalapy.python.library=python3.11"
             )
             javaLauncher.set(
@@ -105,6 +135,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             } else {
                 this.additionalConfiguration()
             }
+            dependsOn(installCustomDependency)
         }
         val capitalizedName = it.nameWithoutExtension.capitalized()
         val graphic by basetask("run${capitalizedName}Graphic") {
