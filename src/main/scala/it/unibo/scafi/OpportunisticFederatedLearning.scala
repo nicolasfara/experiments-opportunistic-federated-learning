@@ -1,7 +1,7 @@
 package it.unibo.scafi
 
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
-import PythonModules._
+import interop.PythonModules._
 import me.shadaj.scalapy.py
 
 class OpportunisticFederatedLearning
@@ -10,6 +10,9 @@ class OpportunisticFederatedLearning
     with ScafiAlchemistSupport
     with FieldUtils
     with BuildingBlocks {
+
+  private def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double =
+    utils.discrepancy(myModel.state_dict(), otherModule.state_dict()) // TODO - cast to double
 
   private val localModel = utils.cnn_factory() // TODO - implement
   private val epochs = 2
