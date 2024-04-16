@@ -11,18 +11,17 @@ class OpportunisticFederatedLearning
     with FieldUtils
     with BuildingBlocks {
 
-  private def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double =
-    utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
-
   private val localModel = utils.cnn_factory() // TODO - implement
-
   private val epochs = 2
   private val discrepancyThreshold = 1.0 // TODO
 
   override def main(): Any = {
 
     val data = utils.get_dataset(mid()) // TODO - implement
-    val aggregators = S(discrepancyThreshold, metric = () => computeMetric(localModel, nbr(localModel)))
+    val aggregators = S(
+      discrepancyThreshold,
+      metric = () => discrepancyMetric(localModel, nbr(localModel))
+    )
     42
 //    val model = FooModel(mid())
 //    val models = excludingSelf.reifyField(nbr(model))
@@ -32,5 +31,20 @@ class OpportunisticFederatedLearning
 //    models.keys.map(id => id -> (evaluations(id) + neighEvals(id)) / 2).toMap
 //    // second metric (discrepancy)
 //    val discrepancies = models.map { case(id, model) => id -> model.diff(model) } // T
+  }
+
+  private def discrepancyMetric(
+      myModel: py.Dynamic,
+      otherModule: py.Dynamic
+  ): Double =
+    utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
+
+  private def evalModel(myModel: py.Dynamic): Double = ??? // TODO - implement
+
+  private def accuracyBasedMetric(model: py.Dynamic): Double = {
+    val models = includingSelf.reifyField(nbr(model))
+    val evaluations = models.map { case (id, model) => id -> evalModel(model) }
+    val neighEvals = excludingSelf.reifyField(nbr(evaluations))
+    (neighEvals(mid)(nbr(mid)) + neighEvals(nbr(mid))(mid)) / 2
   }
 }
