@@ -3,6 +3,7 @@ package it.unibo.scafi
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import interop.PythonModules._
 import me.shadaj.scalapy.py
+import me.shadaj.scalapy.py.PyQuote
 
 class OpportunisticFederatedLearning
     extends AggregateProgram
@@ -11,8 +12,10 @@ class OpportunisticFederatedLearning
     with FieldUtils
     with BuildingBlocks {
 
-  private def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double =
-    utils.discrepancy(myModel.state_dict(), otherModule.state_dict()) // TODO - cast to double
+  private def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double = {
+    val discrepancy = utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
+    py"$discrepancy".as[Double]
+  }
 
   private val localModel = utils.cnn_factory() // TODO - implement
   private val epochs = 2
