@@ -12,31 +12,56 @@ class OpportunisticFederatedLearning
     with FieldUtils
     with BuildingBlocks {
 
-  private val localModel = utils.cnn_factory() // TODO - implement
+  private var localModel = utils.cnn_factory() // TODO - implement py
   private val epochs = 2
-  private val discrepancyThreshold = 1.0 // TODO
+  private var tick = 0
+  private val discrepancyThreshold = 1.3 // TODO - check
 
   override def main(): Any = {
-
-    val data = utils.get_dataset(mid()) // TODO - implement
+    tick = tick + 1
+    val data = utils.get_dataset(mid()) // TODO - implement py
     val aggregators = S(
       discrepancyThreshold,
       metric = () => discrepancyMetric(localModel, nbr(localModel))
     )
-    42
-//    val model = FooModel(mid())
-//    val models = excludingSelf.reifyField(nbr(model))
-//    // first metric
-//    val evaluations = models.map { case(id, model) => id -> model.eval(data) } // T
-//    val neighEvals = excludingSelf.reifyField(nbr(evaluations)).map { case(id, evals) => id -> evals(id) } // T - 1
-//    models.keys.map(id => id -> (evaluations(id) + neighEvals(id)) / 2).toMap
-//    // second metric (discrepancy)
-//    val discrepancies = models.map { case(id, model) => id -> model.diff(model) } // T
+    val (evolvedModel, trainLoss, valLoss) = localTraining(localModel, data)
+    node.put("TrainLoss", trainLoss)
+    node.put("ValidationLoss", valLoss)
+    val potential = classicGradient(aggregators)
+    val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
+    val aggregatedModel = averageWeights(info)
+    val sharedModel = broadcast(aggregators, aggregatedModel)
+    if(aggregators) { snapshot(sharedModel, mid(), tick) }
+    mux(impulsesEvery(tick)){
+      localModel = averageWeights(Set(sample(sharedModel), sample(evolvedModel)))
+    } {
+      localModel = evolvedModel
+    }
+  }
+
+  private def localTraining(model: py.Dynamic, data: py.Dynamic): (py.Dynamic, Double, Double) = {
+    val result = utils.local_train(model, epochs, data) // TODO - implement py
+    val trainLoss = py"$result[0]".as[Double]
+    val valLoss = py"$result[1]".as[Double]
+    val newWeights = py"$result[2]"
+    val freshNN = utils.cnn_factory()
+    freshNN.load_state_dict(newWeights)
+    (freshNN, trainLoss, valLoss)
   }
 
   private def discrepancyMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double = {
     val discrepancy = utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
     py"$discrepancy".as[Double]
+  }
+
+  private def sample(model: py.Dynamic): py.Dynamic =
+    model.state_dict()
+
+  private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = {
+    val averageWeights = utils.average_weights(models.toSeq.toPythonProxy) // TODO - implement py
+    val freshNN = utils.cnn_factory()
+    freshNN.load_state_dict(averageWeights)
+    freshNN
   }
 
   private def evalModel(myModel: py.Dynamic): Double = ??? // TODO - implement
@@ -46,5 +71,12 @@ class OpportunisticFederatedLearning
     val evaluations = models.map { case (id, model) => id -> evalModel(model) }
     val neighEvals = excludingSelf.reifyField(nbr(evaluations))
     (neighEvals(mid)(nbr(mid)) + neighEvals(nbr(mid))(mid)) / 2
+  }
+
+  private def snapshot(model: py.Dynamic, id: Int, tick: Int): Unit = {
+    torch.save(
+      model.state_dict(),
+      s"networks/aggregator-$id-$tick"
+    )
   }
 }
