@@ -12,7 +12,7 @@ COPY requirements.txt ./
 RUN sed -i '/alias(libs.plugins.gitSemVer)/d' build.gradle.kts
 COPY gradlew* ./
 RUN apt update && apt install -y python3 && apt install -y python3-pip
-RUN pip install requirements.txt
+RUN pip install -r requirements.txt
 RUN cd python && python3 setup.py sdist bdist_wheel
 RUN pip install -e python
 RUN CI=true ./gradlew runAllGraphic
