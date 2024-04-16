@@ -12,11 +12,6 @@ class OpportunisticFederatedLearning
     with FieldUtils
     with BuildingBlocks {
 
-  private def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double = {
-    val discrepancy = utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
-    py"$discrepancy".as[Double]
-  }
-
   private val localModel = utils.cnn_factory() // TODO - implement
   private val epochs = 2
   private val discrepancyThreshold = 1.0 // TODO
@@ -39,11 +34,10 @@ class OpportunisticFederatedLearning
 //    val discrepancies = models.map { case(id, model) => id -> model.diff(model) } // T
   }
 
-  private def discrepancyMetric(
-      myModel: py.Dynamic,
-      otherModule: py.Dynamic
-  ): Double =
-    utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
+  private def discrepancyMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double = {
+    val discrepancy = utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
+    py"$discrepancy".as[Double]
+  }
 
   private def evalModel(myModel: py.Dynamic): Double = ??? // TODO - implement
 
