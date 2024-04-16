@@ -11,8 +11,8 @@ class OpportunisticFederatedLearning
     with FieldUtils
     with BuildingBlocks {
 
-  def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double =
-    utils.discrepancy(myModel, otherModule)
+  private def computeMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double =
+    utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
 
   private val localModel = utils.cnn_factory() // TODO - implement
 
