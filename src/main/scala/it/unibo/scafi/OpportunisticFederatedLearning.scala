@@ -70,7 +70,7 @@ class OpportunisticFederatedLearning
     val models = includingSelf.reifyField(nbr(model))
     val evaluations = models.map { case (id, model) => id -> evalModel(model) }
     val neighEvals = excludingSelf.reifyField(nbr(evaluations))
-    (neighEvals(mid)(nbr(mid)) + neighEvals(nbr(mid))(mid)) / 2
+    (neighEvals(mid())(nbr(mid())) + neighEvals(nbr(mid()))(mid())) / 2
   }
 
   private def snapshot(model: py.Dynamic, id: Int, tick: Int): Unit = {
