@@ -117,5 +117,7 @@ def init_cnn(seed):
     model = CNNMnist()
     torch.save(model.state_dict(), f'networks/initial_model_seed_{seed}')
 
-def cnn_factory():
-    ...
+def cnn_loader(seed):
+    model = CNNMnist()
+    model.load_state_dict(torch.load(f'networks/initial_model_seed_{seed}'))
+    return model
