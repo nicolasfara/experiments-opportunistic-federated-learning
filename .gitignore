@@ -8,5 +8,7 @@ env/
 **/dist
 **/*.egg-info
 **/__pycache__
+networks/
+hs_err_pid*
 data_summary_*
 timeprocessed
