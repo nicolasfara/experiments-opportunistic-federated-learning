@@ -19,9 +19,7 @@ class OpportunisticFederatedLearning
 
   override def main(): Any = {
     val data = utils.get_dataset(mid()) // TODO - implement py
-    rep((localModel, 0)) { v =>
-      val model = v._1
-      val tick = v._2
+    rep((localModel, 0)) { case (model, tick) =>
       val aggregators = S(
         discrepancyThreshold,
         metric = () => discrepancyMetric(model, nbr(model))
@@ -30,19 +28,30 @@ class OpportunisticFederatedLearning
       node.put("TrainLoss", trainLoss)
       node.put("ValidationLoss", valLoss)
       val potential = classicGradient(aggregators)
-      val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
+      val info = C[Double, Set[py.Dynamic]](
+        potential,
+        _ ++ _,
+        Set(sample(evolvedModel)),
+        Set.empty
+      )
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(aggregators, aggregatedModel)
-      if(aggregators) { snapshot(sharedModel, mid(), tick) }
-      mux(impulsesEvery(tick)){
-        (averageWeights(Set(sample(sharedModel), sample(evolvedModel))), tick + 1)
+      if (aggregators) { snapshot(sharedModel, mid(), tick) }
+      mux(impulsesEvery(tick)) {
+        (
+          averageWeights(Set(sample(sharedModel), sample(evolvedModel))),
+          tick + 1
+        )
       } {
         (evolvedModel, tick + 1)
       }
     }
   }
 
-  private def localTraining(model: py.Dynamic, data: py.Dynamic): (py.Dynamic, Double, Double) = {
+  private def localTraining(
+      model: py.Dynamic,
+      data: py.Dynamic
+  ): (py.Dynamic, Double, Double) = {
     val result = utils.local_train(model, epochs, data) // TODO - implement py
     val trainLoss = py"$result[0]".as[Double]
     val valLoss = py"$result[1]".as[Double]
@@ -52,8 +61,12 @@ class OpportunisticFederatedLearning
     (freshNN, trainLoss, valLoss)
   }
 
-  private def discrepancyMetric(myModel: py.Dynamic, otherModule: py.Dynamic): Double = {
-    val discrepancy = utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
+  private def discrepancyMetric(
+      myModel: py.Dynamic,
+      otherModule: py.Dynamic
+  ): Double = {
+    val discrepancy =
+      utils.discrepancy(myModel.state_dict(), otherModule.state_dict())
     py"$discrepancy".as[Double]
   }
 
@@ -61,7 +74,8 @@ class OpportunisticFederatedLearning
     model.state_dict()
 
   private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = {
-    val averageWeights = utils.average_weights(models.toSeq.toPythonProxy) // TODO - implement py
+    val averageWeights =
+      utils.average_weights(models.toSeq.toPythonProxy) // TODO - implement py
     val freshNN = utils.cnn_factory()
     freshNN.load_state_dict(averageWeights)
     freshNN
