@@ -36,6 +36,9 @@ class OpportunisticFederatedLearning
       )
       val (evolvedModel, trainLoss) = localTraining(model)
       node.put("TrainLoss", trainLoss)
+      val neighbourhoodMetric = excludingSelf.reifyField(actualMetric(model))
+      node.put("NeighbourhoodMetric", neighbourhoodMetric)
+      node.put("aggregators", aggregators)
       val potential = classicGradient(aggregators)
       val info = C[Double, Set[py.Dynamic]](
         potential,
