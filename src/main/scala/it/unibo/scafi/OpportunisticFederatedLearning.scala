@@ -64,7 +64,7 @@ class OpportunisticFederatedLearning
     val result = utils.local_training(model, epochs, data, batch_size)
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
-    val freshNN = utils.cnn_loader()
+    val freshNN = utils.cnn_loader(seed())
     freshNN.load_state_dict(newWeights)
     (freshNN, trainLoss)
   }
@@ -84,7 +84,7 @@ class OpportunisticFederatedLearning
   private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = {
     val averageWeights =
       utils.average_weights(models.toSeq.toPythonProxy)
-    val freshNN = utils.cnn_loader()
+    val freshNN = utils.cnn_loader(seed())
     freshNN.load_state_dict(averageWeights)
     freshNN
   }
