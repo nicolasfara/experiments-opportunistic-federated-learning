@@ -29,7 +29,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   metric: &metric
     formula: |
-      """it.unibo.scafi.OpportunisticFederatedLearning.DISCREPANCY"""
+      """it.unibo.scafi.OpportunisticFederatedLearning.ACCURACY"""
 seeds:
   scenario: *seed
   simulation: *seed
