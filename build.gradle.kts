@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.configurationcache.extensions.capitalized
 import java.awt.GraphicsEnvironment
 import java.io.ByteArrayOutputStream
@@ -90,7 +91,10 @@ val installPythonDependencies by tasks.register<Exec>("installPythonDependencies
     group = alchemistGroup
     description = "Installs Python dependencies"
     dependsOn(createVirtualEnv)
-    commandLine("$pythonVirtualEnvName/bin/pip", "install", "-r", "requirements.txt")
+    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        true -> commandLine("$pythonVirtualEnvName\\Scripts\\pip", "install", "-r", "requirements.txt")
+        false -> commandLine("$pythonVirtualEnvName/bin/pip", "install", "-r", "requirements.txt")
+    }
 }
 
 val buildCustomDependency by tasks.register<Exec>("buildCustomDependency") {
@@ -98,14 +102,20 @@ val buildCustomDependency by tasks.register<Exec>("buildCustomDependency") {
     description = "Builds custom Python dependencies"
     dependsOn(installPythonDependencies)
     workingDir("python")
-    commandLine("../$pythonVirtualEnvName/bin/python", "setup.py", "sdist", "bdist_wheel")
+    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        true -> commandLine("$pythonVirtualEnvName\\Scripts\\python", "setup.py", "sdist", "bdist_wheel")
+        false -> commandLine("../$pythonVirtualEnvName/bin/python", "setup.py", "sdist", "bdist_wheel")
+    }
 }
 
 val installCustomDependency by tasks.register<Exec>("installCustomDependency") {
     group = alchemistGroup
     description = "Installs custom Python dependencies"
     dependsOn(buildCustomDependency)
-    commandLine("$pythonVirtualEnvName/bin/pip", "install", "-e", "python")
+    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        true -> commandLine("$pythonVirtualEnvName\\Scripts\\pip", "install", "-e", "python")
+        false -> commandLine("$pythonVirtualEnvName/bin/pip", "install", "-e", "python")
+    }
 }
 
 /*
