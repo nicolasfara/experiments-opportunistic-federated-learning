@@ -24,6 +24,7 @@ class OpportunisticFederatedLearning
     }
   private val epochs = 2
   private val batch_size = 25
+  private val every = 5
   private val discrepancyThreshold = 1.3 // TODO - check
 
   override def main(): Any = {
@@ -107,6 +108,9 @@ class OpportunisticFederatedLearning
   private def seed(): Int = node.get("seed").toString.toDouble.toInt
 
   private def indexes() = node.get("data").asInstanceOf[List[Int]].toPythonProxy
+
+  private def impulsesEvery(time: Int): Boolean = time % every == 0
+
 }
 
 object OpportunisticFederatedLearning {
