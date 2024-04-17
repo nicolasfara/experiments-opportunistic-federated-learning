@@ -122,9 +122,9 @@ class OpportunisticFederatedLearning
     )
   }
 
-  private def seed(): Int = node.get("seed").toString.toDouble.toInt
+  private def seed(): Int = node.get[Double]("seed").toInt
 
-  private def indexes() = node.get("data").asInstanceOf[List[Int]].toPythonProxy
+  private def indexes() = node.get[List[Int]]("data").toPythonProxy
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
 
