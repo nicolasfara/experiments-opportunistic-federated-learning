@@ -28,7 +28,8 @@ variables:
       import it.unibo.scafi.interop.PythonModules.utils
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   metric: &metric
-    formula: "discrepancy"
+    formula: |
+      """it.unibo.scafi.OpportunisticFederatedLearning.DISCREPANCY"""
 seeds:
   scenario: *seed
   simulation: *seed

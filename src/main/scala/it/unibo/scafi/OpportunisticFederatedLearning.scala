@@ -110,6 +110,6 @@ class OpportunisticFederatedLearning
 }
 
 object OpportunisticFederatedLearning {
-  private val DISCREPANCY = "discrepancy"
-  private val ACCURACY = "accuracy"
+  val DISCREPANCY = "discrepancy"
+  val ACCURACY = "accuracy"
 }
