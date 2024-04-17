@@ -24,9 +24,9 @@ class OpportunisticFederatedLearning
         (model) => accuracyBasedMetric(model)
     }
   private val epochs = 2
-  private val batch_size = 25
+  private val batch_size = 256
   private val every = 5
-  private val discrepancyThreshold = 1.3 // TODO - check
+  private val discrepancyThreshold = 2.5 // TODO - check
 
   override def main(): Any = {
     rep((localModel, 0)) { case (model, tick) =>
@@ -46,6 +46,8 @@ class OpportunisticFederatedLearning
         Set(sample(evolvedModel)),
         Set.empty
       )
+      val leader = broadcast(aggregators, mid())
+      node.put("leader", leader)
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(aggregators, aggregatedModel)
       if (aggregators) { snapshot(sharedModel, mid(), tick) }
