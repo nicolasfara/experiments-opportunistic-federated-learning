@@ -16,6 +16,8 @@ variables:
   dataShuffle: &dataShuffle
     type: ArbitraryVariable
     parameters: [true, [true, false]]
+  dataFraction: &dataFraction
+    formula: 1.0
   longSideNodes: &longSideNodes
     formula: 4
   shortSideNodes: &shortSideNodes
@@ -29,7 +31,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   metric: &metric
     formula: |
-      """it.unibo.scafi.OpportunisticFederatedLearning.ACCURACY"""
+      """it.unibo.scafi.OpportunisticFederatedLearning.DISCREPANCY"""
 seeds:
   scenario: *seed
   simulation: *seed
@@ -54,7 +56,7 @@ environment:
         type: Trigger
         parameters: [ 0 ]
       type: DataDistributionReaction
-      parameters: [*seed, *areas, *dataShuffle]
+      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
 
 deployments:
   type: Grid

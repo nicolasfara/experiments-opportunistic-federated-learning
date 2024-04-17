@@ -94,7 +94,7 @@ def get_dataset(indexes):
     return dataset
 
 
-def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int, shuffling: bool = False):
+def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int, shuffling: bool = False, data_fraction = 1.0):
     np.random.seed(random_seed)  # set seed from Alchemist to make the partitioning deterministic
     apply_transform = transforms.ToTensor()
 
@@ -115,7 +115,9 @@ def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int
             np.random.shuffle(records_per_class)
         split_record_per_node = np.array_split(records_per_class, nodes_per_area)
         for node in nodes:
-            index_mapping[node] = split_record_per_node[node % nodes_per_area].tolist()
+            list = split_record_per_node[node % nodes_per_area].tolist()
+            bound = int(len(list) * data_fraction)
+            index_mapping[node] = list[:bound]
 
     return index_mapping
 

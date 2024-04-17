@@ -9,13 +9,14 @@ class DataDistributionReaction[T, P <: Position[P]](
     distribution: TimeDistribution[T],
     seed: Int,
     areas: Int,
-    dataShuffle: Boolean
+    dataShuffle: Boolean,
+    dataFraction: Double
 ) extends AbstractGlobalReaction(environment, distribution) {
 
   override protected def executeBeforeUpdateDistribution(): Unit = {
     val nodesCount = environment.getNodes.size()
     val dataDistribution = PythonModules.utils
-      .dataset_to_nodes_partitioning(nodesCount, areas, seed, dataShuffle)
+      .dataset_to_nodes_partitioning(nodesCount, areas, seed, dataShuffle, dataFraction)
       .as[Map[Int, List[Int]]]
 
     dataDistribution.foreach { case (id, data) =>
