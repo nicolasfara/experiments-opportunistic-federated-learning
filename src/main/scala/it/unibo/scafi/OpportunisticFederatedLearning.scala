@@ -13,6 +13,7 @@ class OpportunisticFederatedLearning
     with BuildingBlocks {
 
   private lazy val localModel = utils.cnn_loader(seed())
+  private lazy val data = utils.get_dataset(indexes())
   private lazy val metricSelection: String =
     node.get[String]("metric")
   private lazy val actualMetric: (py.Dynamic) => Double =
@@ -28,13 +29,12 @@ class OpportunisticFederatedLearning
   private val discrepancyThreshold = 1.3 // TODO - check
 
   override def main(): Any = {
-    val data = utils.get_dataset(indexes())
     rep((localModel, 0)) { case (model, tick) =>
       val aggregators = S(
         discrepancyThreshold,
         metric = () => actualMetric(model)
       )
-      val (evolvedModel, trainLoss) = localTraining(model, data)
+      val (evolvedModel, trainLoss) = localTraining(model)
       node.put("TrainLoss", trainLoss)
       val potential = classicGradient(aggregators)
       val info = C[Double, Set[py.Dynamic]](
@@ -58,8 +58,7 @@ class OpportunisticFederatedLearning
   }
 
   private def localTraining(
-      model: py.Dynamic,
-      data: py.Dynamic
+      model: py.Dynamic
   ): (py.Dynamic, Double) = {
     val result = utils.local_training(model, epochs, data, batch_size)
     val newWeights = py"$result[0]"
@@ -89,7 +88,12 @@ class OpportunisticFederatedLearning
     freshNN
   }
 
-  private def evalModel(myModel: py.Dynamic): Double = ??? // TODO - implement
+  private def evalModel(myModel: py.Dynamic): Double = {
+    val result = utils.evaluate(myModel, data, batch_size)
+    val accuracy = py"$result[0]".as[Double]
+    val loss = py"$result[1]".as[Double]
+    accuracy
+  }
 
   private def accuracyBasedMetric(model: py.Dynamic): Double = {
     val models = includingSelf.reifyField(nbr(model))
