@@ -27,7 +27,8 @@ variables:
     formula: |
       import it.unibo.scafi.interop.PythonModules.utils
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
-
+  metric: &metric
+    formula: "discrepancy"
 seeds:
   scenario: *seed
   simulation: *seed
@@ -58,16 +59,10 @@ deployments:
   type: Grid
   parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
   contents:
-    - in:
-        type: Rectangle
-        parameters: [-6, -6, 2, 2]
-      molecule: source
-      concentration: true
-    - in:
-        type: Rectangle
-        parameters: [ 0, 0, *longSideNodes, *shortSideNodes ]
-      molecule: seed
+    - molecule: seed
       concentration: *seed
+    - molecule: metric
+      concentration: *metric
   programs: *gradient
 
 

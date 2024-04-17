@@ -13,7 +13,15 @@ class OpportunisticFederatedLearning
     with BuildingBlocks {
 
   private lazy val localModel = utils.cnn_loader(seed())
-
+  private lazy val metricSelection: String =
+    node.get[String]("metric")
+  private lazy val actualMetric: (py.Dynamic) => Double =
+    metricSelection match {
+      case OpportunisticFederatedLearning.DISCREPANCY =>
+        (model) => discrepancyMetric(model, nbr(model))
+      case OpportunisticFederatedLearning.ACCURACY =>
+        (model) => accuracyBasedMetric(model)
+    }
   private val epochs = 2
   private val discrepancyThreshold = 1.3 // TODO - check
 
@@ -22,7 +30,7 @@ class OpportunisticFederatedLearning
     rep((localModel, 0)) { case (model, tick) =>
       val aggregators = S(
         discrepancyThreshold,
-        metric = () => discrepancyMetric(model, nbr(model))
+        metric = () => actualMetric(model)
       )
       val (evolvedModel, trainLoss, valLoss) = localTraining(model, data)
       node.put("TrainLoss", trainLoss)
@@ -98,4 +106,9 @@ class OpportunisticFederatedLearning
   }
 
   private def seed(): Int = node.get("seed").toString.toDouble.toInt
+}
+
+object OpportunisticFederatedLearning {
+  private val DISCREPANCY = "discrepancy"
+  private val ACCURACY = "accuracy"
 }
