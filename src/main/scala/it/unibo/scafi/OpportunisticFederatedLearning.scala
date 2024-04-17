@@ -12,30 +12,33 @@ class OpportunisticFederatedLearning
     with FieldUtils
     with BuildingBlocks {
 
-  private var localModel = utils.cnn_factory() // TODO - implement py
+  private lazy val localModel = utils.cnn_loader(seed())
+
   private val epochs = 2
-  private var tick = 0
   private val discrepancyThreshold = 1.3 // TODO - check
 
   override def main(): Any = {
-    tick = tick + 1
     val data = utils.get_dataset(mid()) // TODO - implement py
-    val aggregators = S(
-      discrepancyThreshold,
-      metric = () => discrepancyMetric(localModel, nbr(localModel))
-    )
-    val (evolvedModel, trainLoss, valLoss) = localTraining(localModel, data)
-    node.put("TrainLoss", trainLoss)
-    node.put("ValidationLoss", valLoss)
-    val potential = classicGradient(aggregators)
-    val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
-    val aggregatedModel = averageWeights(info)
-    val sharedModel = broadcast(aggregators, aggregatedModel)
-    if(aggregators) { snapshot(sharedModel, mid(), tick) }
-    mux(impulsesEvery(tick)){
-      localModel = averageWeights(Set(sample(sharedModel), sample(evolvedModel)))
-    } {
-      localModel = evolvedModel
+    rep((localModel, 0)) { v =>
+      val model = v._1
+      val tick = v._2
+      val aggregators = S(
+        discrepancyThreshold,
+        metric = () => discrepancyMetric(model, nbr(model))
+      )
+      val (evolvedModel, trainLoss, valLoss) = localTraining(model, data)
+      node.put("TrainLoss", trainLoss)
+      node.put("ValidationLoss", valLoss)
+      val potential = classicGradient(aggregators)
+      val info = C[Double, Set[py.Dynamic]](potential, _ ++ _, Set(sample(evolvedModel)), Set.empty)
+      val aggregatedModel = averageWeights(info)
+      val sharedModel = broadcast(aggregators, aggregatedModel)
+      if(aggregators) { snapshot(sharedModel, mid(), tick) }
+      mux(impulsesEvery(tick)){
+        (averageWeights(Set(sample(sharedModel), sample(evolvedModel))), tick + 1)
+      } {
+        (evolvedModel, tick + 1)
+      }
     }
   }
 
@@ -79,4 +82,6 @@ class OpportunisticFederatedLearning
       s"networks/aggregator-$id-$tick"
     )
   }
+
+  private def seed(): Int = node.get("seed").toString.toDouble.toInt
 }
