@@ -105,7 +105,7 @@ class OpportunisticFederatedLearning
   private def snapshot(model: py.Dynamic, id: Int, tick: Int): Unit = {
     torch.save(
       model.state_dict(),
-      s"networks/aggregator-$id-$tick"
+      s"networks/aggregator-$id-time-$tick"
     )
   }
 
