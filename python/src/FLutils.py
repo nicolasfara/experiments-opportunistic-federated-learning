@@ -112,6 +112,10 @@ def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int
 
     return index_mapping
 
+def init_cnn(seed):
+    torch.manual_seed(seed)
+    model = CNNMnist()
+    torch.save(model.state_dict(), f'networks/initial_model_seed_{seed}')
 
 def cnn_factory():
     ...
