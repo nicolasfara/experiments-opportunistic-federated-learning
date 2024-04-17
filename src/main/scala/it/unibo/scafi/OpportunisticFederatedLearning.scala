@@ -23,6 +23,7 @@ class OpportunisticFederatedLearning
         (model) => accuracyBasedMetric(model)
     }
   private val epochs = 2
+  private val batch_size = 25
   private val discrepancyThreshold = 1.3 // TODO - check
 
   override def main(): Any = {
@@ -32,9 +33,8 @@ class OpportunisticFederatedLearning
         discrepancyThreshold,
         metric = () => actualMetric(model)
       )
-      val (evolvedModel, trainLoss, valLoss) = localTraining(model, data)
+      val (evolvedModel, trainLoss) = localTraining(model, data)
       node.put("TrainLoss", trainLoss)
-      node.put("ValidationLoss", valLoss)
       val potential = classicGradient(aggregators)
       val info = C[Double, Set[py.Dynamic]](
         potential,
@@ -59,14 +59,13 @@ class OpportunisticFederatedLearning
   private def localTraining(
       model: py.Dynamic,
       data: py.Dynamic
-  ): (py.Dynamic, Double, Double) = {
-    val result = utils.local_train(model, epochs, data) // TODO - implement py
-    val trainLoss = py"$result[0]".as[Double]
-    val valLoss = py"$result[1]".as[Double]
-    val newWeights = py"$result[2]"
+  ): (py.Dynamic, Double) = {
+    val result = utils.local_training(model, epochs, data, batch_size)
+    val newWeights = py"$result[0]"
+    val trainLoss = py"$result[1]".as[Double]
     val freshNN = utils.cnn_factory()
     freshNN.load_state_dict(newWeights)
-    (freshNN, trainLoss, valLoss)
+    (freshNN, trainLoss)
   }
 
   private def discrepancyMetric(

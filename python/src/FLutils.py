@@ -128,3 +128,22 @@ def cnn_loader(seed):
     model = CNNMnist()
     model.load_state_dict(torch.load(f'networks/initial_model_seed_{seed}'))
     return model
+
+def local_training(model, epochs, data, batch_size):
+    criterion = nn.NLLLoss()
+    model.train()
+    epoch_loss = []
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
+    data_loader = DataLoader(data, batch_size=batch_size, shuffle=True)
+    for _ in range(epochs):
+        batch_loss = []
+        for batch_index, (images, labels) in enumerate(data_loader):
+            model.zero_grad()
+            log_probs = model(images)
+            loss = criterion(log_probs, labels)
+            loss.backward()
+            optimizer.step()
+            batch_loss.append(loss.item())
+        mean_epoch_loss = sum(batch_loss) / len(batch_loss)
+        epoch_loss.append(mean_epoch_loss)
+    return model.state_dict(), sum(epoch_loss) / len(epoch_loss)
