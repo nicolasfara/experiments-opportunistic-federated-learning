@@ -87,10 +87,20 @@ val createVirtualEnv by tasks.register<Exec>("createVirtualEnv") {
     commandLine("python", "-m", "venv", pythonVirtualEnvName)
 }
 
+val createPyTorchNetworkFolder by tasks.register<Exec>("createPyTorchNetworkFolder") {
+    group = alchemistGroup
+    description = "Creates a folder for PyTorch networks"
+    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        true -> commandLine("mkdir", "networks")
+        false -> commandLine("mkdir", "-p", "networks")
+    }
+    commandLine("mkdir", "-p", "networks")
+}
+
 val installPythonDependencies by tasks.register<Exec>("installPythonDependencies") {
     group = alchemistGroup
     description = "Installs Python dependencies"
-    dependsOn(createVirtualEnv)
+    dependsOn(createVirtualEnv, createPyTorchNetworkFolder)
     when (Os.isFamily(Os.FAMILY_WINDOWS)) {
         true -> commandLine("$pythonVirtualEnvName\\Scripts\\pip", "install", "-r", "requirements.txt")
         false -> commandLine("$pythonVirtualEnvName/bin/pip", "install", "-r", "requirements.txt")
