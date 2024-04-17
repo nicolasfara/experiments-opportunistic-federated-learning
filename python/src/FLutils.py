@@ -4,7 +4,9 @@ from torch import nn
 from torchvision import datasets, transforms
 import torch.nn.functional as F
 import numpy as np
+from torch.utils.data import DataLoader, Dataset
 
+dataset_download_path = "../../build/dataset"
 
 class CNNMnist(nn.Module):
 
@@ -25,6 +27,20 @@ class CNNMnist(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
+class DatasetSplit(Dataset):
+    """An abstract Dataset class wrapped around Pytorch Dataset class.
+    """
+
+    def __init__(self, dataset, idxs):
+        self.dataset = dataset
+        self.idxs = [int(i) for i in idxs]
+
+    def __len__(self):
+        return len(self.idxs)
+
+    def __getitem__(self, item):
+        image, label = self.dataset[self.idxs[item]]
+        return torch.tensor(image), torch.tensor(label)
 
 def average_weights(models):
     """ Averages the weights
@@ -64,31 +80,22 @@ def discrepancy(weightsA, weightsB):
     return d / S_t
 
 
-def get_dataset(args):
-    data_dir = '../data/mnist/'
+def get_dataset(indexes):
+
     apply_transform = transforms.ToTensor()
 
-    train_dataset = datasets.MNIST(data_dir,
+    train_dataset = datasets.MNIST(dataset_download_path,
                                    train=True,
-                                   download=True,
+                                   download=False,
                                    transform=apply_transform)
 
-    test_dataset = datasets.MNIST(data_dir,
-                                  train=False,
-                                  download=True,
-                                  transform=apply_transform)
+    dataset = DatasetSplit(train_dataset, indexes)
 
-    # TODO!!!
-    # I think you do not need to call this function here
-    # When you call this function `get_dataset` in args you should have the list of indexes for each user available as molecule
-    # user_groups = dataset_to_nodes_partitioning(args['num_users'], args['areas'], args['seed'])
-
-    return train_dataset, test_dataset  # , user_groups
+    return dataset
 
 
 def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int, shuffling: bool = False):
     np.random.seed(random_seed)  # set seed from Alchemist to make the partitioning deterministic
-    dataset_download_path = "../../build/dataset"
     apply_transform = transforms.ToTensor()
 
     train_dataset = datasets.MNIST(dataset_download_path, train=True, download=True, transform=apply_transform)

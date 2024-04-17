@@ -3,7 +3,7 @@ package it.unibo.scafi
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import interop.PythonModules._
 import me.shadaj.scalapy.py
-import me.shadaj.scalapy.py.PyQuote
+import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 
 class OpportunisticFederatedLearning
     extends AggregateProgram
@@ -26,7 +26,7 @@ class OpportunisticFederatedLearning
   private val discrepancyThreshold = 1.3 // TODO - check
 
   override def main(): Any = {
-    val data = utils.get_dataset(mid()) // TODO - implement py
+    val data = utils.get_dataset(indexes())
     rep((localModel, 0)) { case (model, tick) =>
       val aggregators = S(
         discrepancyThreshold,
@@ -83,7 +83,7 @@ class OpportunisticFederatedLearning
 
   private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = {
     val averageWeights =
-      utils.average_weights(models.toSeq.toPythonProxy) // TODO - implement py
+      utils.average_weights(models.toSeq.toPythonProxy)
     val freshNN = utils.cnn_factory()
     freshNN.load_state_dict(averageWeights)
     freshNN
@@ -106,6 +106,8 @@ class OpportunisticFederatedLearning
   }
 
   private def seed(): Int = node.get("seed").toString.toDouble.toInt
+
+  private def indexes() = node.get("data").asInstanceOf[List[Int]].toPythonProxy
 }
 
 object OpportunisticFederatedLearning {
