@@ -132,7 +132,10 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             classpath = sourceSets["main"].runtimeClasspath
             args("run", it.absolutePath)
             jvmArgs(
-                "-Dscalapy.python.programname=$pythonVirtualEnvName/bin/python",
+                when (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    true -> "-Dscalapy.python.programname=$pythonVirtualEnvName\\Scripts\\python"
+                    false -> "-Dscalapy.python.programname=$pythonVirtualEnvName/bin/python"
+                },
                 "-Dscalapy.python.library=python3.11"
             )
             javaLauncher.set(
