@@ -84,7 +84,7 @@ val pythonVirtualEnvName = "env"
 val createVirtualEnv by tasks.register<Exec>("createVirtualEnv") {
     group = alchemistGroup
     description = "Creates a virtual environment for Python"
-    commandLine("python", "-m", "venv", pythonVirtualEnvName)
+    commandLine("python3.11", "-m", "venv", pythonVirtualEnvName)
 }
 
 val createPyTorchNetworkFolder by tasks.register<Exec>("createPyTorchNetworkFolder") {
@@ -146,7 +146,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                     true -> "-Dscalapy.python.programname=$pythonVirtualEnvName\\Scripts\\python"
                     false -> "-Dscalapy.python.programname=$pythonVirtualEnvName/bin/python"
                 },
-                "-Dscalapy.python.library=python3.11"
+                //"-Dscalapy.python.library=python3.10"
             )
             javaLauncher.set(
                 javaToolchains.launcherFor {
@@ -178,10 +178,10 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                 """
                     launcher: {
                         parameters: {
-                            batch: [ seed, spacing, error ],
+                            batch: [ seed ],
                             showProgress: true,
                             autoStart: true,
-                            parallelism: $threadCount,
+                            parallelism: 1,
                         }
                     }
                 """.trimIndent())

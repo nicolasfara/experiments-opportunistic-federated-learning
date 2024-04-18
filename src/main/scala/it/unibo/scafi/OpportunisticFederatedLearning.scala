@@ -5,6 +5,26 @@ import interop.PythonModules._
 import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 
+/**
+ * Metriche
+ *  loss media per ogni area / set di etichette (nico) -- validation/test loss
+ *  loss globale (nico)
+ *  accuracy media per ogni area (nico) (di validatio)
+ *  accuracy globale (dom)
+ *  divergenza (all'interno dell'area) -- gianlu
+ *  corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico
+ *  convergenza
+ *  (specifico sul movimento) -- io
+ *  accuracy + loss su test -- dom
+ *
+ * algoritmo fedarato centrizzato (baseline) -- dom
+ * aggiungi validation loss per ogni nodo (davide)
+ * posizionamento del dato in base alla posizione spaziale (idea: fare una griglia di nodi che non eseguono il programma ma servono solo per posizionare i dati e poi usi 1-nn search per trovare i dati) -- nico
+ * usare più aree (io)
+ * usare aree fuzzy (k=2) -- gianlu
+ * movimento di un nodo -- gianlu
+ * con più nodi (???) -- gianlu
+ */
 class OpportunisticFederatedLearning
     extends AggregateProgram
     with StandardSensors
@@ -16,40 +36,45 @@ class OpportunisticFederatedLearning
   private lazy val data = utils.get_dataset(indexes())
   private lazy val metricSelection: String =
     node.get[String]("metric")
-  private lazy val actualMetric: (py.Dynamic) => Double =
+  private def actualMetric: (py.Dynamic) => () => Double =
     metricSelection match {
       case OpportunisticFederatedLearning.DISCREPANCY =>
-        (model) => discrepancyMetric(model, nbr(model))
+        (model) => () => discrepancyMetric(model, nbr(model))
       case OpportunisticFederatedLearning.ACCURACY =>
-        (model) => accuracyBasedMetric(model)
+        (model) =>
+          val models = includingSelf.reifyField(nbr(model))
+          val evaluations = models.map { case (id, model) => id -> evalModel(model) }
+          val neighEvals = includingSelf.reifyField(nbr(evaluations))
+          () => accuracyBasedMetric(neighEvals)
     }
   private val epochs = 2
-  private val batch_size = 256
+  private val batch_size = 64
   private val every = 5
-  private val discrepancyThreshold = 0.5 // TODO - check
+  private val discrepancyThreshold = 30 // TODO - check
 
   override def main(): Any = {
-    rep((localModel, 0)) { case (model, tick) =>
+    rep((localModel, 1)) { case (model, tick) =>
+      val metric = actualMetric(model)
       val aggregators = S(
         discrepancyThreshold,
-        metric = () => actualMetric(model)
+        metric = metric
       )
       val (evolvedModel, trainLoss) = localTraining(model)
       node.put("TrainLoss", trainLoss)
-      val neighbourhoodMetric = excludingSelf.reifyField(actualMetric(model))
+      val neighbourhoodMetric = excludingSelf.reifyField(metric())
       node.put("NeighbourhoodMetric", neighbourhoodMetric)
       node.put("aggregators", aggregators)
-      val potential = classicGradient(aggregators)
+      val potential = classicGradient(aggregators, metric)
       val info = C[Double, Set[py.Dynamic]](
         potential,
         _ ++ _,
         Set(sample(evolvedModel)),
         Set.empty
       )
-      val leader = broadcast(aggregators, mid())
+      val leader = broadcast(aggregators, mid(), metric)
       node.put("leader", leader)
       val aggregatedModel = averageWeights(info)
-      val sharedModel = broadcast(aggregators, aggregatedModel)
+      val sharedModel = broadcast(aggregators, aggregatedModel, metric)
       if (aggregators) { snapshot(sharedModel, mid(), tick) }
       mux(impulsesEvery(tick)) {
         (
@@ -97,13 +122,10 @@ class OpportunisticFederatedLearning
     val result = utils.evaluate(myModel, data, batch_size)
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
-    accuracy
+    loss
   }
 
-  private def accuracyBasedMetric(model: py.Dynamic): Double = {
-    val models = includingSelf.reifyField(nbr(model))
-    val evaluations = models.map { case (id, model) => id -> evalModel(model) }
-    val neighEvals = excludingSelf.reifyField(nbr(evaluations))
+  private def accuracyBasedMetric(neighEvals: Map[ID, Map[ID, Double]]): Double = {
     def directLinkMeToNeigh(): Double =
       neighEvals
         .getOrElse(mid(), Map.empty)

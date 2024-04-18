@@ -75,7 +75,10 @@ def discrepancy(weightsA, weightsB):
     for key in keys:
         w_a = weightsA[key]
         w_b = weightsB[key]
-        norm = torch.norm(torch.sub(w_a, w_b))
+        ## compute euclidean distance between w_a and w_b
+        norm = torch.dist(w_a, w_b, p=2)
+
+        #norm = torch.sub(w_a, w_b)
         d += norm
     return d / S_t
 
@@ -117,7 +120,8 @@ def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int
         for node in nodes:
             list = split_record_per_node[node % nodes_per_area].tolist()
             bound = int(len(list) * data_fraction)
-            index_mapping[node] = list[:bound]
+            indexes = np.random.choice(len(list), bound)
+            index_mapping[node] = np.array(list)[indexes].tolist()
 
     return index_mapping
 
