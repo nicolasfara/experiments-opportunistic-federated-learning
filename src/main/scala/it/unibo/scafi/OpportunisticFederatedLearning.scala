@@ -8,7 +8,7 @@ import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 /**
  * Metriche
  *  loss media per ogni area / set di etichette (nico) -- validation/test loss
- *  loss globale (nico)
+ *  loss globale (nico)   [X]
  *  accuracy media per ogni area (nico) (di validatio)
  *  accuracy globale (dom)
  *  divergenza (all'interno dell'area) -- gianlu

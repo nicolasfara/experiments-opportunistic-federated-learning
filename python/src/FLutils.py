@@ -121,7 +121,7 @@ def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int
             list = split_record_per_node[node % nodes_per_area].tolist()
             bound = int(len(list) * data_fraction)
             indexes = np.random.choice(len(list), bound)
-            index_mapping[node] = np.array(list)[indexes].tolist()
+            index_mapping[node] = (np.array(list)[indexes].tolist(), classes.tolist())
 
     return index_mapping
 

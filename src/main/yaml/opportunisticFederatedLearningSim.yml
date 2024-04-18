@@ -82,13 +82,17 @@ export:
     data:
       - time
       - type: AreaCountExporter
-        parameters: [ ]
+      - type: AreaCorrectness
       - molecule: TrainLoss
+        aggregators: [mean, variance]
+        value-filter: onlyFinite
+        precision: 3
+      - molecule: TrainLoss
+        aggregators: [ min, max, mean ]
         value-filter: onlyfinite
-        aggregators: [min, max, mean]
       - molecule: ValidationLoss
+        aggregators: [ min, max, mean ]
         value-filter: onlyfinite
-        aggregators: [min, max, mean]
       - molecule: ValidationAccuracy
+        aggregators: [ min, max, mean ]
         value-filter: onlyfinite
-        aggregators: [min, max, mean]

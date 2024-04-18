@@ -17,11 +17,12 @@ class DataDistributionReaction[T, P <: Position[P]](
     val nodesCount = environment.getNodes.size()
     val dataDistribution = PythonModules.utils
       .dataset_to_nodes_partitioning(nodesCount, areas, seed, dataShuffle, dataFraction)
-      .as[Map[Int, List[Int]]]
+      .as[Map[Int, (List[Int], Set[Int])]]
 
-    dataDistribution.foreach { case (id, data) =>
+    dataDistribution.foreach { case (id, (data, labels)) =>
       val node = environment.getNodeByID(id)
       node.setConcentration(new SimpleMolecule("data"), data.asInstanceOf[T])
+      node.setConcentration(new SimpleMolecule("labels"), labels.asInstanceOf[T])
     }
   }
 
