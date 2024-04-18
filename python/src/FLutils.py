@@ -4,7 +4,7 @@ from torch import nn
 from torchvision import datasets, transforms
 import torch.nn.functional as F
 import numpy as np
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, random_split
 
 dataset_download_path = "../../build/dataset"
 
@@ -171,3 +171,9 @@ def evaluate(model, data, batch_size):
 
     accuracy = correct / total
     return accuracy, loss
+    
+def train_val_split(data):
+    train_size = int(len(data) * 0.8)
+    validation_size = len(data) - train_size
+    train_set, val_set = random_split(data, [train_size, validation_size])
+    return train_set, val_set

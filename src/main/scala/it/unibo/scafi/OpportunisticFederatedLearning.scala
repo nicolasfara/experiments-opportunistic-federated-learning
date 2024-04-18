@@ -43,7 +43,7 @@ class OpportunisticFederatedLearning
       case OpportunisticFederatedLearning.ACCURACY =>
         (model) =>
           val models = includingSelf.reifyField(nbr(model))
-          val evaluations = models.map { case (id, model) => id -> evalModel(model) }
+          val evaluations = models.map { case (id, model) => id -> evalModel(model, data)._2 }
           val neighEvals = includingSelf.reifyField(nbr(evaluations))
           () => accuracyBasedMetric(neighEvals)
     }
@@ -59,8 +59,12 @@ class OpportunisticFederatedLearning
         discrepancyThreshold,
         metric = metric
       )
-      val (evolvedModel, trainLoss) = localTraining(model)
+      val (trainData, valData) = split_dataset()
+      val (evolvedModel, trainLoss) = localTraining(model, trainData)
+      val (validationAccuracy, validationLoss) = evalModel(evolvedModel, valData)
       node.put("TrainLoss", trainLoss)
+      node.put("ValidationLoss", validationLoss)
+      node.put("ValidationAccuracy", validationAccuracy)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
       node.put("NeighbourhoodMetric", neighbourhoodMetric)
       node.put("aggregators", aggregators)
@@ -88,9 +92,10 @@ class OpportunisticFederatedLearning
   }
 
   private def localTraining(
-      model: py.Dynamic
+      model: py.Dynamic,
+      trainData: py.Dynamic
   ): (py.Dynamic, Double) = {
-    val result = utils.local_training(model, epochs, data, batch_size)
+    val result = utils.local_training(model, epochs, trainData, batch_size)
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
     val freshNN = utils.cnn_loader(seed())
@@ -118,11 +123,11 @@ class OpportunisticFederatedLearning
     freshNN
   }
 
-  private def evalModel(myModel: py.Dynamic): Double = {
+  private def evalModel(myModel: py.Dynamic, validationData: py.Dynamic): (Double, Double) = {
     val result = utils.evaluate(myModel, data, batch_size)
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
-    loss
+    (accuracy, loss)
   }
 
   private def accuracyBasedMetric(neighEvals: Map[ID, Map[ID, Double]]): Double = {
@@ -149,6 +154,13 @@ class OpportunisticFederatedLearning
   private def indexes() = node.get[List[Int]]("data").toPythonProxy
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
+
+  private def split_dataset(): (py.Dynamic, py.Dynamic) = {
+    val datasets = utils.train_val_split(data)
+    val trainData = py"$datasets[0]"
+    val valData = py"$datasets[1]"
+    (trainData, valData)
+  }
 
 }
 
