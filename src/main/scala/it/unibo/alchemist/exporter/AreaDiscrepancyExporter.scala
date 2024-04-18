@@ -10,5 +10,5 @@ class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
 
   override def getColumnNames: util.List[String] = (1 to areas).map(i => s"AreaDiscrepancy$i").toList.asJava
 
-  override def extractData[T](environment: Environment[T, _], actionable: Actionable[T], time: Time, l: Long): util.Map[String, lang.Double] =
+  override def extractData[T](environment: Environment[T, _], actionable: Actionable[T], time: Time, l: Long): util.Map[String, lang.Double] = ???
 }
