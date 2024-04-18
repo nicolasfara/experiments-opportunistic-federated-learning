@@ -17,7 +17,7 @@ variables:
     type: ArbitraryVariable
     parameters: [true, [true, false]]
   dataFraction: &dataFraction
-    formula: 1.0
+    formula: 0.1
   longSideNodes: &longSideNodes
     formula: 4
   shortSideNodes: &shortSideNodes
@@ -31,14 +31,14 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   metric: &metric
     formula: |
-      """it.unibo.scafi.OpportunisticFederatedLearning.DISCREPANCY"""
+      """it.unibo.scafi.OpportunisticFederatedLearning.ACCURACY"""
 seeds:
   scenario: *seed
   simulation: *seed
 
 network-model:
   type: ConnectWithinDistance
-  parameters: [2.5]
+  parameters: [1.5]
 
 _gradient: &gradient
   - time-distribution: 1

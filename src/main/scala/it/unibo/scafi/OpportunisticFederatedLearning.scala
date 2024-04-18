@@ -26,7 +26,7 @@ class OpportunisticFederatedLearning
   private val epochs = 2
   private val batch_size = 256
   private val every = 5
-  private val discrepancyThreshold = 2.5 // TODO - check
+  private val discrepancyThreshold = 0.5 // TODO - check
 
   override def main(): Any = {
     rep((localModel, 0)) { case (model, tick) =>
