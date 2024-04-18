@@ -84,7 +84,7 @@ val pythonVirtualEnvName = "env"
 val createVirtualEnv by tasks.register<Exec>("createVirtualEnv") {
     group = alchemistGroup
     description = "Creates a virtual environment for Python"
-    commandLine("python", "-m", "venv", pythonVirtualEnvName)
+    commandLine("python3", "-m", "venv", pythonVirtualEnvName)
 }
 
 val createPyTorchNetworkFolder by tasks.register<Exec>("createPyTorchNetworkFolder") {
