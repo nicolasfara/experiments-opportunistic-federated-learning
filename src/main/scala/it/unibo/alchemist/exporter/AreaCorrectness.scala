@@ -10,8 +10,8 @@ import java.{lang, util}
 
 class AreaCorrectness extends AbstractDoubleExporter {
 
-  lazy val leaderMolecule = Sensors.leaderId
-  lazy val labelsMolecule = Sensors.labels
+  private lazy val leaderMolecule = Sensors.leaderId
+  private lazy val labelsMolecule = Sensors.labels
 
   override def getColumnNames: util.List[String] =
     util.List.of("AreaCorrectness")
@@ -40,7 +40,7 @@ class AreaCorrectness extends AbstractDoubleExporter {
     val leaderNode = node.manager
     val leaderLabels = leaderNode.getOrElse(labelsMolecule, Set.empty[Int])
     val labelUnion = labels.union(leaderLabels)
-    val correctness = labels.size.toDouble / labelUnion.size
-    (node.getId  -> correctness)
+    val correctness = leaderLabels.size.toDouble / labelUnion.size
+    node.getId -> correctness
   }
 }
