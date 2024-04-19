@@ -81,7 +81,8 @@ export:
     data:
       - time
       - type: AreaCountExporter
-      - type: AreaCorrectness
+      - type: AreaCorrectnessExporter
+      - type: AverageLossExporter
       - molecule: TrainLoss
         aggregators: [mean, variance]
         value-filter: onlyFinite
