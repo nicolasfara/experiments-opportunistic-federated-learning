@@ -77,6 +77,7 @@ class OpportunisticFederatedLearning
       )
       val leader = broadcast(aggregators, mid(), metric)
       node.put("leader", leader)
+      if(aggregators) { node.put("models", info) }
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(aggregators, aggregatedModel, metric)
       if (aggregators) { snapshot(sharedModel, mid(), tick) }
