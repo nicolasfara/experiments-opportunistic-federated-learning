@@ -1,5 +1,6 @@
 package it.unibo.alchemist.exporter
 
+import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.model.{Environment, Node, Position}
 
@@ -11,4 +12,8 @@ object Utils {
   }
 
   implicit def stringToMolecule(s: String): SimpleMolecule = new SimpleMolecule(s)
+
+  implicit class RichNode[T](node: Node[T]) {
+    def manager: SimpleNodeManager[T] = new SimpleNodeManager[T](node)
+  }
 }
