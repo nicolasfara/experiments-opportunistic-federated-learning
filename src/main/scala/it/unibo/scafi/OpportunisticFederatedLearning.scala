@@ -7,12 +7,12 @@ import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import Sensors._
 /**
  * Metriche
- *  loss media per ogni area / set di etichette (nico) -- validation/test loss
+ *  loss media per ogni area / set di etichette (nico) -- validation/test loss [X]
  *  loss globale (nico)   [X]
  *  accuracy media per ogni area (nico) (di validatio)
  *  accuracy globale (dom)
  *  divergenza (all'interno dell'area) -- gianlu
- *  corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico
+ *  corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico [X]
  *  convergenza
  *  (specifico sul movimento) -- io
  *  accuracy + loss su test -- dom
