@@ -8,6 +8,7 @@ object Sensors {
   val data = "Data"
   val labels = "Labels"
 
+  val model = "Model"
   val models = "Models"
   val trainLoss = "TrainLoss"
   val validationLoss = "ValidationLoss"

@@ -52,7 +52,7 @@ class OpportunisticFederatedLearning
         threshold,
         metric = metric
       )
-      val (trainData, valData) = split_dataset()
+      val (trainData, valData) = splitDataset()
       val (evolvedModel, trainLoss) = localTraining(model, trainData)
       val (validationAccuracy, validationLoss) = evalModel(evolvedModel, valData)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
@@ -64,12 +64,13 @@ class OpportunisticFederatedLearning
         Set.empty
       )
       val leader = broadcast(isAggregator, mid(), metric)
-      if(isAggregator) { node.put(models, info) }
       val aggregatedModel = averageWeights(info)
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
-      node.put(leaderId, leader)
+      node.put(Sensors.leaderId, leader)
+      node.put(Sensors.model, sample(localModel))
+      if(isAggregator) { node.put(models, info) }
       node.put(Sensors.neighbourhoodMetric, neighbourhoodMetric)
       node.put(Sensors.isAggregator, isAggregator)
       node.put(Sensors.trainLoss, trainLoss)
@@ -150,7 +151,7 @@ class OpportunisticFederatedLearning
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
 
-  private def split_dataset(): (py.Dynamic, py.Dynamic) = {
+  private def splitDataset(): (py.Dynamic, py.Dynamic) = {
     val datasets = utils.train_val_split(data)
     val trainData = py"$datasets[0]"
     val valData = py"$datasets[1]"
