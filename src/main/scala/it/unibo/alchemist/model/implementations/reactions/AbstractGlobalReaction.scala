@@ -1,8 +1,8 @@
 package it.unibo.alchemist.model.implementations.reactions
 
-import it.unibo.alchemist.model.{Action, Actionable, Condition, Dependency, Environment, GlobalReaction, Position, Time, TimeDistribution}
+import it.unibo.alchemist.model.{Action, Actionable, Condition, Dependency, Environment, GlobalReaction, Position, Time, TimeDistribution, Node}
 import org.danilopianini.util.{ListSet, ListSets}
-
+import scala.jdk.CollectionConverters.IteratorHasAsScala
 import java.util
 
 abstract class AbstractGlobalReaction[T, P <: Position[P]](
@@ -48,4 +48,7 @@ abstract class AbstractGlobalReaction[T, P <: Position[P]](
   override def getRate: Double = distribution.getRate
 
   override def getTau: Time = distribution.getNextOccurence
+
+  // Utility methods
+  def nodes: List[Node[T]] = environment.getNodes.iterator().asScala.toList
 }
