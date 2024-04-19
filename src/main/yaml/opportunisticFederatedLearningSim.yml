@@ -62,9 +62,9 @@ deployments:
   type: Grid
   parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
   contents:
-    - molecule: seed
+    - molecule: Seed
       concentration: *seed
-    - molecule: lossThreshold
+    - molecule: LossThreshold
       concentration: *lossThreshold
   programs: *gradient
 

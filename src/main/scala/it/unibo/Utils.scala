@@ -1,4 +1,4 @@
-package it.unibo.alchemist.exporter
+package it.unibo
 
 import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager
 import it.unibo.alchemist.model.molecules.SimpleMolecule

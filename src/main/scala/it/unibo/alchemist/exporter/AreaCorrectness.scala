@@ -1,16 +1,17 @@
 package it.unibo.alchemist.exporter
 
 import it.unibo.alchemist.boundary.extractors.AbstractDoubleExporter
-import it.unibo.alchemist.exporter.Utils._
+import it.unibo.Utils._
 import it.unibo.alchemist.model._
 import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager
+import it.unibo.scafi.Sensors
 
 import java.{lang, util}
 
 class AreaCorrectness extends AbstractDoubleExporter {
 
-  lazy val leaderMolecule = "leader"
-  lazy val labelsMolecule = "labels"
+  lazy val leaderMolecule = Sensors.leaderId
+  lazy val labelsMolecule = Sensors.labels
 
   override def getColumnNames: util.List[String] =
     util.List.of("AreaCorrectness")

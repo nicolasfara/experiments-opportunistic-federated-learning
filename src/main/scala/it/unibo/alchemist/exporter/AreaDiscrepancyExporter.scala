@@ -5,7 +5,7 @@ import it.unibo.alchemist.model.{Actionable, Environment, Time}
 
 import java.{lang, util}
 import scala.jdk.CollectionConverters.SeqHasAsJava
-import Utils._
+import it.unibo.Utils._
 import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager
 class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
 

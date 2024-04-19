@@ -94,7 +94,7 @@
       "val": 67
     },
     "molFilter": true,
-    "molString": "aggregators",
+    "molString": "IsAggregator",
     "molPropertyFilter": true,
     "property": "",
     "writingPropertyValue": true,
@@ -154,7 +154,7 @@
       "val": 47
     },
     "molFilter": true,
-    "molString": "leader",
+    "molString": "Leader",
     "molPropertyFilter": true,
     "property": "",
     "writingPropertyValue": false,

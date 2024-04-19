@@ -4,7 +4,7 @@ import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import interop.PythonModules._
 import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
-
+import Sensors._
 /**
  * Metriche
  *  loss media per ogni area / set di etichette (nico) -- validation/test loss
@@ -43,37 +43,38 @@ class OpportunisticFederatedLearning
   private val epochs = 2
   private val batch_size = 64
   private val every = 5
-  private lazy val threshold = sense[Double]("lossThreshold")
+  private lazy val threshold = sense[Double](lossThreshold)
 
   override def main(): Any = {
     rep((localModel, 1)) { case (model, tick) =>
       val metric = actualMetric(model)
-      val aggregators = S(
+      val isAggregator = S(
         threshold,
         metric = metric
       )
       val (trainData, valData) = split_dataset()
       val (evolvedModel, trainLoss) = localTraining(model, trainData)
       val (validationAccuracy, validationLoss) = evalModel(evolvedModel, valData)
-      node.put("TrainLoss", trainLoss)
-      node.put("ValidationLoss", validationLoss)
-      node.put("ValidationAccuracy", validationAccuracy)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
-      node.put("NeighbourhoodMetric", neighbourhoodMetric)
-      node.put("aggregators", aggregators)
-      val potential = classicGradient(aggregators, metric)
+      val potential = classicGradient(isAggregator, metric)
       val info = C[Double, Set[py.Dynamic]](
         potential,
         _ ++ _,
         Set(sample(evolvedModel)),
         Set.empty
       )
-      val leader = broadcast(aggregators, mid(), metric)
-      node.put("leader", leader)
-      if(aggregators) { node.put("models", info) }
+      val leader = broadcast(isAggregator, mid(), metric)
+      if(isAggregator) { node.put(models, info) }
       val aggregatedModel = averageWeights(info)
-      val sharedModel = broadcast(aggregators, aggregatedModel, metric)
-      if (aggregators) { snapshot(sharedModel, mid(), tick) }
+      val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
+      if (isAggregator) { snapshot(sharedModel, mid(), tick) }
+      // Actuations
+      node.put(leaderId, leader)
+      node.put(Sensors.neighbourhoodMetric, neighbourhoodMetric)
+      node.put(Sensors.isAggregator, isAggregator)
+      node.put(Sensors.trainLoss, trainLoss)
+      node.put(Sensors.validationLoss, validationLoss)
+      node.put(Sensors.validationAccuracy, validationAccuracy)
       mux(impulsesEvery(tick)) {
         (
           averageWeights(Set(sample(sharedModel), sample(evolvedModel))),
@@ -118,7 +119,7 @@ class OpportunisticFederatedLearning
   }
 
   private def evalModel(myModel: py.Dynamic, validationData: py.Dynamic): (Double, Double) = {
-    val result = utils.evaluate(myModel, data, batch_size)
+    val result = utils.evaluate(myModel, validationData, batch_size)
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
     (accuracy, loss)
@@ -143,9 +144,9 @@ class OpportunisticFederatedLearning
     )
   }
 
-  private def seed(): Int = node.get[Double]("seed").toInt
+  private def seed(): Int = node.get[Double](Sensors.seed).toInt
 
-  private def indexes() = node.get[List[Int]]("data").toPythonProxy
+  private def indexes() = node.get[List[Int]](Sensors.data).toPythonProxy
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
 
@@ -156,9 +157,4 @@ class OpportunisticFederatedLearning
     (trainData, valData)
   }
 
-}
-
-object OpportunisticFederatedLearning {
-  val DISCREPANCY = "discrepancy"
-  val LOSS = "accuracy"
 }

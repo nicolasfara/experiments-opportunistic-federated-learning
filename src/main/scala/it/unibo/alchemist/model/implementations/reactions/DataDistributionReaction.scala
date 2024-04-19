@@ -3,7 +3,8 @@ package it.unibo.alchemist.model.implementations.reactions
 import it.unibo.alchemist.model._
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.scafi.interop.PythonModules
-
+import it.unibo.Utils._
+import it.unibo.scafi.Sensors
 class DataDistributionReaction[T, P <: Position[P]](
     environment: Environment[T, P],
     distribution: TimeDistribution[T],
@@ -20,9 +21,9 @@ class DataDistributionReaction[T, P <: Position[P]](
       .as[Map[Int, (List[Int], Set[Int])]]
 
     dataDistribution.foreach { case (id, (data, labels)) =>
-      val node = environment.getNodeByID(id)
-      node.setConcentration(new SimpleMolecule("data"), data.asInstanceOf[T])
-      node.setConcentration(new SimpleMolecule("labels"), labels.asInstanceOf[T])
+      val node = environment.getNodeByID(id).manager
+      node.put(Sensors.data, data.asInstanceOf[T])
+      node.put(Sensors.labels, labels.asInstanceOf[T])
     }
   }
 
