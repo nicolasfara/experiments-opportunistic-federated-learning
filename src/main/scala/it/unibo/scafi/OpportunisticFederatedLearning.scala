@@ -42,7 +42,7 @@ class OpportunisticFederatedLearning
     }
   private val epochs = 2
   private val batch_size = 64
-  private val every = 5
+  private val every = 2
   private lazy val threshold = sense[Double](lossThreshold)
 
   override def main(): Any = {
@@ -57,28 +57,31 @@ class OpportunisticFederatedLearning
       val (validationAccuracy, validationLoss) = evalModel(evolvedModel, valData)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
       val potential = classicGradient(isAggregator, metric)
-      val info = C[Double, Set[py.Dynamic]](
+      val leader = broadcast(isAggregator, mid(), metric)
+      val info = CWithMetric[List[py.Dynamic]](
         potential,
         _ ++ _,
-        Set(sample(evolvedModel)),
-        Set.empty
+        List(evolvedModel),
+        List.empty,
+        metric
       )
-      val leader = broadcast(isAggregator, mid(), metric)
-      val aggregatedModel = averageWeights(info)
+      node.put("potential", potential)
+      val aggregatedModel = averageWeights(info.map(sample))
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
       node.put(Sensors.leaderId, leader)
-      node.put(Sensors.model, sample(localModel))
+      node.put(Sensors.model, sharedModel)
       if(isAggregator) { node.put(models, info) }
       node.put(Sensors.neighbourhoodMetric, neighbourhoodMetric)
       node.put(Sensors.isAggregator, isAggregator)
       node.put(Sensors.trainLoss, trainLoss)
       node.put(Sensors.validationLoss, validationLoss)
       node.put(Sensors.validationAccuracy, validationAccuracy)
+      node.put("parent", findParentWithMetric(potential, metric))
       mux(impulsesEvery(tick)) {
         (
-          averageWeights(Set(sample(sharedModel), sample(evolvedModel))),
+          sharedModel,
           tick + 1
         )
       } {
@@ -111,9 +114,9 @@ class OpportunisticFederatedLearning
   private def sample(model: py.Dynamic): py.Dynamic =
     model.state_dict()
 
-  private def averageWeights(models: Set[py.Dynamic]): py.Dynamic = {
+  private def averageWeights(models: List[py.Dynamic]): py.Dynamic = {
     val averageWeights =
-      utils.average_weights(models.toSeq.toPythonProxy)
+      utils.average_weights(models.toPythonProxy)
     val freshNN = utils.cnn_loader(seed())
     freshNN.load_state_dict(averageWeights)
     freshNN
@@ -158,4 +161,28 @@ class OpportunisticFederatedLearning
     (trainData, valData)
   }
 
+  def CWithMetric[V](potential: Double, acc: (V, V) => V, local: V, Null: V, metric: () => Double): V =
+    rep(local) { case (query) =>
+      acc(local, foldhood(Null)(acc) {
+        mux(nbr(findParentWithMetric(potential, metric) == mid())) { nbr(query) } { nbr(Null) }
+      })
+    }
+
+  def findParentWithMetric(potential: Double, metric: () => Double): ID = {
+    val others = excludingSelf.reifyField((potential - nbr(potential)).similarTo(metric()))
+    node.put("parents", others)
+    mux(potential == 0.0) {
+      Int.MaxValue
+    } {
+      others.find(_._2).map(_._1).getOrElse(Int.MaxValue)
+    }
+  }
+
+  implicit class RichDouble(d: Double) {
+    def similarTo(other: Double, precision: Double = 0.01): Boolean =
+      smaller(d, other + precision) && smaller(other, d + precision)
+  }
+
+  private def smaller(a: Double, b: Double): Boolean =
+    a < b
 }

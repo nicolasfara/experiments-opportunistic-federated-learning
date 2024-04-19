@@ -70,7 +70,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 20
+  parameters: 100
 
 export:
   - type: CSVExporter

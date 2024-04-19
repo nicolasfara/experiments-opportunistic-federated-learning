@@ -32,9 +32,10 @@ class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
 
   def computeAverageDiscrepancy[T](leader: SimpleNodeManager[T]): Double = {
     val leaderModel = leader.get[py.Dynamic](Sensors.model)
-    val areaModels = leader.get[Set[py.Dynamic]](Sensors.models)
+    val areaModels = leader.get[List[py.Dynamic]](Sensors.models)
+    println(leader.node.getId, areaModels.size)
     val discrepancies = areaModels.map(nodeModel =>
-      utils.discrepancy(leaderModel, nodeModel).as[Double])
+      utils.discrepancy(leaderModel.state_dict(), nodeModel.state_dict()).as[Double])
     discrepancies.sum / discrepancies.size
   }
 }
