@@ -29,9 +29,9 @@ variables:
     formula: |
       import it.unibo.scafi.interop.PythonModules.utils
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
-  metric: &metric
-    formula: |
-      """it.unibo.scafi.OpportunisticFederatedLearning.ACCURACY"""
+  lossThreshold: &lossThreshold
+    type: ArbitraryVariable
+    parameters: [120.0, [60.0, 80.0, 100.0, 120.0, 150.0]]
 seeds:
   scenario: *seed
   simulation: *seed
@@ -64,14 +64,14 @@ deployments:
   contents:
     - molecule: seed
       concentration: *seed
-    - molecule: metric
-      concentration: *metric
+    - molecule: lossThreshold
+      concentration: *lossThreshold
   programs: *gradient
 
 
 terminate:
   type: AfterTime
-  parameters: 20
+  parameters: 1000
 
 export:
   - type: CSVExporter

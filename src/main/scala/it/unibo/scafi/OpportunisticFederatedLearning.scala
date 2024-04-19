@@ -34,14 +34,7 @@ class OpportunisticFederatedLearning
 
   private lazy val localModel = utils.cnn_loader(seed())
   private lazy val data = utils.get_dataset(indexes())
-  private lazy val metricSelection: String =
-    node.get[String]("metric")
-  private def actualMetric: (py.Dynamic) => () => Double =
-    metricSelection match {
-      case OpportunisticFederatedLearning.DISCREPANCY =>
-        (model) => () => discrepancyMetric(model, nbr(model))
-      case OpportunisticFederatedLearning.ACCURACY =>
-        (model) =>
+  private def actualMetric: (py.Dynamic) => () => Double = (model) => {
           val models = includingSelf.reifyField(nbr(model))
           val evaluations = models.map { case (id, model) => id -> evalModel(model, data)._2 }
           val neighEvals = includingSelf.reifyField(nbr(evaluations))
@@ -50,13 +43,13 @@ class OpportunisticFederatedLearning
   private val epochs = 2
   private val batch_size = 64
   private val every = 5
-  private val discrepancyThreshold = 30 // TODO - check
+  private lazy val threshold = sense[Double]("lossThreshold")
 
   override def main(): Any = {
     rep((localModel, 1)) { case (model, tick) =>
       val metric = actualMetric(model)
       val aggregators = S(
-        discrepancyThreshold,
+        threshold,
         metric = metric
       )
       val (trainData, valData) = split_dataset()
@@ -140,7 +133,7 @@ class OpportunisticFederatedLearning
       neighEvals
         .getOrElse(nbr(mid()), Map.empty)
         .getOrElse(mid(), Double.PositiveInfinity)
-    (directLinkMeToNeigh + directLinkNeighToMe) / 2
+    (directLinkMeToNeigh + directLinkNeighToMe)
   }
 
   private def snapshot(model: py.Dynamic, id: Int, tick: Int): Unit = {
@@ -167,5 +160,5 @@ class OpportunisticFederatedLearning
 
 object OpportunisticFederatedLearning {
   val DISCREPANCY = "discrepancy"
-  val ACCURACY = "accuracy"
+  val LOSS = "accuracy"
 }
