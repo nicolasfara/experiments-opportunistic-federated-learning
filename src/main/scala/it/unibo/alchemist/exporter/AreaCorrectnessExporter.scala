@@ -8,7 +8,7 @@ import it.unibo.scafi.Sensors
 
 import java.{lang, util}
 
-class AreaCorrectness extends AbstractDoubleExporter {
+class AreaCorrectnessExporter extends AbstractDoubleExporter {
 
   private lazy val leaderMolecule = Sensors.leaderId
   private lazy val labelsMolecule = Sensors.labels
