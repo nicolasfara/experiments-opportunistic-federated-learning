@@ -1,3 +1,106 @@
+## [1.3.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.2.0...1.3.0) (2024-04-19)
+
+
+### Features
+
+* add accuracyBasedMetric ([0e3646b](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/0e3646bbc94e7b1048dab2a9d2b42253b5e631a4))
+* add Area correctness metric an minor refactoring ([595e475](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/595e475d1b77d36d7563fa383e522c78f6f9b403))
+* add average loss exporter per area ([f779924](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/f779924b1bce10c28a1d9c02ff23b0fff3aecd4d))
+* add custom metric ([8419035](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/84190355f239c2ef9caa85d60c74dc3d6b3f31e3))
+* add data fraction param to data sampling ([9ed7e4a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/9ed7e4a0035b472c29377bf0e459cd520c5aa80d))
+* add dataset split loading for each node ([7910292](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/79102920916a0186f516a6cd335c15fa1130e8f8))
+* add export of global train loss, validation loss and validation accuracy ([23532af](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/23532af0ae33a79435b81f3dda5e2978205c6d4e))
+* add local model loading using simulation seed ([6e54c66](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/6e54c6612beb3da649b3789cef0445b863475bd8))
+* add machinery for dataset partitioning ([f58189f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/f58189f28a77cb98af3fdb9022a1ae70d4c5dfbc))
+* add nn initialization with simulation seed ([bf28fee](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/bf28fee22f3f580464ad4cba9eea6a1f153af3ee))
+* add validation on each node ([d6436a2](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d6436a2e6e91a8ec1f8775404487a8204bb818ec))
+* call python code for dataset partitioning ([1d262ef](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/1d262efdefd0e3d7db7b85f4fb14c02ecc7d6d84))
+* **docker:** add python packages installation for the simulation ([71b6337](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/71b633734438ce6e8c8cd0925798eed7bd5303fb))
+* implement eval ([ae66cae](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/ae66caef72bb6674067f4027645b39600dd1b8a6))
+* implement local training ([036ee84](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/036ee84f6ccc95d028b20ecc8bba6cc321cfe35b))
+* implement scr ([4a98f64](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4a98f648b277f521cc52effe3e17bf41b2fe4781))
+* **python:** implement evaluation ([d845740](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d8457409c18a26502c37a810176872a746967fce))
+* **python:** implement init nn ([33e80dd](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/33e80dd57a35dcbe879526e46c9a8795db6b12b8))
+* **python:** implement nn loader ([cb7e1d9](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/cb7e1d90b82eea94659c3e4831e3d0fd94212513))
+* use exporter in the simulation ([790815f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/790815f556b8c92fb32cc8c015abb5bbaae0b079))
+
+
+### Dependency updates
+
+* **deps:** add scalapy dependency ([7fce899](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/7fce89984f7baa324ac67c3871ef7cc4a6b5fe4f))
+* **deps:** update plugin com.gradle.develocity to v3.17.2 ([4fcc272](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4fcc272bb176c9fe2cf85f32544840b063e0c171))
+
+
+### Bug Fixes
+
+* cnn_factory --> cnn_loader ([2d05e69](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/2d05e69afc63130286a84698d2dcc9f7363b48f4))
+* **docker:** fix requirements installation ([e8869af](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/e8869af1955d9d0e9e335f9927a744b6e51bface))
+* fix cnn_loader call ([bdc6011](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/bdc60115f61f1c5827f017bb8e1309b5256f88cb))
+* fix computeMetric function ([daa2b5c](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/daa2b5ce997d29d522327e2a5584da4aca7eccbf))
+* fix computeMetric function ([b3f4b74](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b3f4b741ecbab5b3109d0cba7b091203ea8263a1))
+* fix impulsesEvery method ([e569613](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/e5696134b1124bbbcdf0a12d53ed0545f50cb8c2))
+* fix snapshot path ([6359eea](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/6359eea099c8ba6ac0285d708c05e8e8ae994efb))
+* handle empty neigh when eval the metrics ([79be6d1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/79be6d1b3731752ce434818a98019dc16871f870))
+* passing the right metric in the formula ([8171142](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/81711429e1d481a389301b91903c60c22cc58ff2))
+* **requirements:** add setuptools ([b74866a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b74866a61f1e46c4bcffb2a8258bb9e72b3bf08e))
+* solve a problem with index ([d41816b](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d41816bd77af65efeb208ed97b9b301b6b93b0a8))
+* solve a problem with metric formula ([4bf9d45](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4bf9d454bc3747d0f0ad550c58971acf16803b64))
+
+
+### Build and continuous integration
+
+* adapt windows paths ([7f07f25](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/7f07f25d618dafcc94234cf9b29d2681a6e894f9))
+* add task for creating networks folder needed by pytorch ([c3e0a1a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/c3e0a1a39e11ecb944331989d05d43c77ecf4ae0))
+* **deps:** update actions/download-artifact action to v4.1.5 ([254fa36](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/254fa3635573bc84d40e1921ca9cf81ad67879df))
+* **deps:** update actions/upload-artifact action to v4.3.2 ([fc02658](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/fc02658ce65eb83e4b5f87ba810ab469299583a6))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.16 ([dd035cc](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/dd035ccf1fd5c9790e6521e807e60a408d1d94bc))
+* disable fail-fast policy ([99d394a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/99d394a4f9c5ae033ba607a6372f2805062850ca))
+* disable windows runner ([c7531ec](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/c7531ec8c5db389ca2e7c45626028138b5e087d3))
+* install python dependencies via gradle tasks ([8afc3cb](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/8afc3cbec15e263849f47752d249168736c1b147))
+* setup python 3.11 for testing native simulations ([66fe529](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/66fe529a0eb12b2af0ee5fbf0531cf0ef0b74502))
+* support windows syntax for script ([a5b1cd4](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/a5b1cd464b152f3c88cda5686ad020f4970904a4))
+* try to exclude macos from CI ([20b4cee](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/20b4cee38a91c7e2722a5a2419bcc0e5da0adee8))
+* use python as command ([f18c8d3](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/f18c8d3a8518ee5ffab25d917f228cf54192efc8))
+* use python of the configured action when in CI ([5d1c9d7](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/5d1c9d708a4b1fa4723040193b825b3aabc87839))
+* use python3 as command ([e3ee042](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/e3ee0425e5beafcf1281c34f7cae5f72f3a16775))
+
+
+### General maintenance
+
+* add metric as a simulation parameter ([2b2f397](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/2b2f397f4bc9b4f19421ce7b700e34fc50cc6174))
+* add metrics field as a value extracted ([d783940](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d783940621407b58096b18638c3197866d927936))
+* **docker:** add python venv dependency ([b80c0a6](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b80c0a693666c7f29fc8dd39ae5c60269735663f))
+* **docker:** create python alias ([bc25011](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/bc2501123a7263ce053becd98b321e52ac428e85))
+* exclude pytorch network folder and hs_err files ([6424a0d](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/6424a0df09f74ea1fa655dd1e74fb714bbede224))
+* exclude virtual env folder ([290c1a9](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/290c1a9c6511d995a4d211ec7a9bef56fda526c1))
+* fist working verison of opportunistic federated learning ([4b22a5f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4b22a5f7b0a193aa66c711fd8fef9273a97a4d30))
+* improve exporter structure ([e65144c](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/e65144c259240eb63b8235e83a15a674b4ecf21e))
+* minors in parameters ([995187a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/995187a6c0d17e546250011b5d522237da23d58d))
+* move PythonModules inside interop package ([586d210](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/586d21000356c1ba5df544524e14ba5a5a0b7d4f))
+* **release:** update gradle.properties .env versions to 1.2.0 [skip ci] ([4f05626](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4f0562636010ce3d7bfa7d83cc4d55aa338dbfcd))
+* remove space ([57b99e7](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/57b99e792364c4473fabdc44dbaa5b0f8b5de842))
+* rename python file ([d42e9fd](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d42e9fd4a8af9d45ef4216acdbe2c2e086b16850))
+* setup scalapy in CI ([fcbdfbf](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/fcbdfbfc25c7727c90dd9cb16525f43aa6c6cece))
+* **simulation:** add missing simulation parameters ([321f205](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/321f205f6fdaa198418eb126dcb7c2f07ecda756))
+* starting working on AreaDiscrepancyExporter ([e0a91d6](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/e0a91d6e2ca5650401b0730a2a815c78aa44e811))
+* update the effect ([85de8bb](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/85de8bbea579895c34076b8e15ea6ec08b392b23))
+* use ??? ([5612298](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/561229877959c83e0232a6e7c18d055ded40a9f2))
+
+
+### Style improvements
+
+* better style ([856a390](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/856a390b660bbdb46606d8d53b37e552e7c4bee7))
+* us explicit () for method invocation ([5cdd76e](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/5cdd76eb0a69774c81024ce5600429c262a2942a))
+
+
+### Refactoring
+
+* improvecode quality avoiding magic string around the code ([634bb35](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/634bb3527c3d80cded4b9e8faef4ff3c5a0d1912))
+* prefer using case (a, b) instead of unpacking inside the lambda ([d7ce47f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d7ce47ffbc260b74baaff189925ada602d2b0792))
+* remove metric as parameter and add threshold as parameter ([6149c9e](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/6149c9e79c1792d4848e9c32b30b3f1381dd99c8))
+* simplify code metric ([aba788a](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/aba788ad4a6a23f1370482c69f460e6456a1d895))
+* use exporter at the end of the name ([fc07f52](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/fc07f52498057dce6a3c31209e0b38be8c63965e))
+
 ## [1.2.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.1.1...1.2.0) (2024-04-15)
 
 
