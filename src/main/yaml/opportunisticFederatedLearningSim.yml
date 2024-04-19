@@ -68,7 +68,6 @@ deployments:
       concentration: *lossThreshold
   programs: *gradient
 
-
 terminate:
   type: AfterTime
   parameters: 1000
