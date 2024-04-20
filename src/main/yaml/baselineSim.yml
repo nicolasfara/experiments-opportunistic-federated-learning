@@ -1,0 +1,97 @@
+incarnation: scafi
+
+_constants:
+  retentionTime: &retentionTime 15.0
+  skewness: &skewness 0.5
+
+variables:
+  seed: &seed
+    min: 0
+    max: 10
+    step: 1
+    default: 7
+  areas: &areas
+    type: ArbitraryVariable
+    parameters: [2, [2, 4]]
+  dataShuffle: &dataShuffle
+    type: ArbitraryVariable
+    parameters: [true, [true, false]]
+  dataFraction: &dataFraction
+    formula: 0.1
+  clientFraction: &clientFraction
+    formula: 0.5
+  longSideNodes: &longSideNodes
+    formula: 4
+  shortSideNodes: &shortSideNodes
+    formula: 3
+  totalNodes: &totalNodes
+    formula: longSideNodes * shortSideNodes
+  initNN: &initNN
+    language: scala
+    formula: |
+      import it.unibo.scafi.interop.PythonModules.utils
+      utils.init_cnn(seed.asInstanceOf[Double].toInt)
+  lossThreshold: &lossThreshold
+    type: ArbitraryVariable
+    parameters: [120.0, [60.0, 80.0, 100.0, 120.0, 150.0]]
+seeds:
+  scenario: *seed
+  simulation: *seed
+
+network-model:
+  type: ConnectWithinDistance
+  parameters: [1.5]
+
+_gradient: &gradient
+  - time-distribution: 1 #TODO - check
+    type: Event
+    actions:
+      - type: RunScafiProgram
+        parameters: [it.unibo.scafi.CentralizedFederatedLearning, *retentionTime]
+  - program: send
+
+environment:
+  type: Continuous2DEnvironment
+  parameters: [ ]
+  global-programs:
+    - time-distribution:
+        type: Trigger
+        parameters: [ 0 ]
+      type: DataDistributionReaction
+      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
+    - time-distribution: 1 #TODO - check
+      type: CentralLearnerReaction
+      parameters: [*seed, *clientFraction]
+
+deployments:
+  type: Grid
+  parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
+  contents:
+    - molecule: Seed
+      concentration: *seed
+    - molecule: LossThreshold
+      concentration: *lossThreshold
+  programs: *gradient
+
+terminate:
+  type: AfterTime
+  parameters: 100
+
+export:
+  - type: CSVExporter
+    parameters:
+      fileNameRoot: "experiment"
+      interval: 1.0
+      exportPath: "data"
+    data:
+      - time
+      - molecule: TrainLoss
+        aggregators: [min, max, mean, variance]
+        value-filter: onlyFinite
+        precision: 3
+      - molecule: ValidationLoss
+        aggregators: [min, max, mean, variance]
+        value-filter: onlyfinite
+      - molecule: ValidationAccuracy
+        aggregators: [min, max, mean, variance]
+        value-filter: onlyfinite
