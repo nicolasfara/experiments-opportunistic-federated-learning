@@ -14,10 +14,12 @@ class CentralLearnerReaction [T, P <: Position[P]](
 ) extends AbstractGlobalReaction(environment, distribution){
 
   override protected def executeBeforeUpdateDistribution(): Unit = {
-    val clients = (environment.getNodes.size() * clientsFraction).toInt
-    val localModels = getModels(clients)
-    val globalModel = averageWeights(localModels)
-    nodes.foreach( n => n.setConcentration(new SimpleMolecule("GlobalModel"), globalModel.asInstanceOf[T]) )
+    if (environment.getSimulation.getTime.toDouble > 1) { // skip the first tick
+      val clients = (environment.getNodes.size() * clientsFraction).toInt
+      val localModels = getModels(clients)
+      val globalModel = averageWeights(localModels)
+      nodes.foreach(n => n.setConcentration(new SimpleMolecule("GlobalModel"), globalModel.asInstanceOf[T]))
+    }
   }
   
   private def getModels(requiredModels: Int): List[py.Dynamic] = {
