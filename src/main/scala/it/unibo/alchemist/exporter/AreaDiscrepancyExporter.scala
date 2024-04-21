@@ -12,30 +12,52 @@ import it.unibo.scafi.interop.PythonModules.utils
 import me.shadaj.scalapy.py
 class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
 
-  override def getColumnNames: util.List[String] = (0 until areas).map(i => s"AreaDiscrepancy$i").toList.asJava
+  override def getColumnNames: util.List[String] =
+    (0 until areas).map(i => s"AreaDiscrepancy$i").toList.asJava
 
-  override def extractData[T](environment: Environment[T, _], actionable: Actionable[T], time: Time, l: Long): util.Map[String, lang.Double] = {
+  override def extractData[T](
+      environment: Environment[T, _],
+      actionable: Actionable[T],
+      time: Time,
+      l: Long
+  ): util.Map[String, lang.Double] = {
     val nodes = environment.getNodesAsScala.map(_.manager)
-    val leaders = nodes.filter(node => node.getOrElse(Sensors.isAggregator, false))
-    val leadersWithLabels =
-      leaders.map(leader => leader -> leader.getOrElse(Sensors.labels, Set.empty[Int]))
-        .groupMap(_._2) { case (leader, labels) => computeAverageDiscrepancy(leader) }
-        .map { case (labels, discrepancies) => labels -> discrepancies.sum / discrepancies.size }
-        .toList
-        .sortBy(_._1.hashCode())
+    val nodesPerAreas =
+      nodes.groupBy(node => node.getOrElse(Sensors.labels, Set.empty[Int]))
+    val areasWithMeanDiscrepancy = nodesPerAreas
+      .map { case (areas, nodes) =>
+        areas -> (nodes.minBy(_.node.getId) -> nodes)
+      }
+      .map { case (areas, (firstNode, nodes)) =>
+        areas -> nodes
+          .map(node => discrepancy(firstNode, node))
+          .sum / nodes.size
+      }
 
-    leadersWithLabels.zipWithIndex
-      .map({ case ((_, discrepancy), i) => s"AreaDiscrepancy$i" -> discrepancy.asInstanceOf[java.lang.Double] })
+    areasWithMeanDiscrepancy.zipWithIndex
+      .map({ case ((_, discrepancy), i) =>
+        s"AreaDiscrepancy$i" -> discrepancy.asInstanceOf[java.lang.Double]
+      })
       .toMap
       .asJava
   }
 
-  def computeAverageDiscrepancy[T](leader: SimpleNodeManager[T]): Double = {
-    val leaderModel = leader.get[py.Dynamic](Sensors.model)
-    val areaModels = leader.get[List[py.Dynamic]](Sensors.models)
-    println(leader.node.getId, areaModels.size)
-    val discrepancies = areaModels.map(nodeModel =>
-      utils.discrepancy(leaderModel.state_dict(), nodeModel.state_dict()).as[Double])
-    discrepancies.sum / discrepancies.size
+  def discrepancy[T](
+      node: SimpleNodeManager[T],
+      other: SimpleNodeManager[T]
+  ): Double = {
+    if (
+      node.getOption(Sensors.model).isEmpty || other
+        .getOption(Sensors.model)
+        .isEmpty
+    ) Double.PositiveInfinity
+    else {
+      val nodeModel = node.get[py.Dynamic](Sensors.model)
+      val otherModel = other.get[py.Dynamic](Sensors.model)
+      utils
+        .discrepancy(nodeModel.state_dict(), otherModel.state_dict())
+        .as[Double]
+    }
   }
+
 }

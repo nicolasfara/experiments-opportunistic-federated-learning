@@ -70,7 +70,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 100
+  parameters: 20
 
 export:
   - type: CSVExporter
@@ -81,11 +81,11 @@ export:
     data:
       - time
       - type: AreaCountExporter
+      - type: AreaDiscrepancyExporter
+        parameters: [ *areas ]
       - type: AreaCorrectnessExporter
       - type: AverageLossExporter
       - type: AverageAccuracyExporter
-      - type: AreaDiscrepancyExporter
-        parameters: [*areas]
       - molecule: TrainLoss
         aggregators: [min, max, mean, variance]
         value-filter: onlyFinite
