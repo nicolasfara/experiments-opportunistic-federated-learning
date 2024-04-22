@@ -5,11 +5,12 @@ scalapy = "0.5.3+2-d2eb0088"
 
 [libraries]
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
+alchemist-euclidean-geometry = {module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
 alchemist-scafi = { module = "it.unibo.alchemist:alchemist-incarnation-scafi", version.ref = "alchemist" }
 scalapy = { module = "dev.scalapy:scalapy-core_2.13", version.ref = "scalapy" }
 
 [bundles]
-alchemist = [ "alchemist", "alchemist-scafi" ]
+alchemist = [ "alchemist", "alchemist-scafi", "alchemist-euclidean-geometry" ]
 
 [plugins]
 gitSemVer = { id = "org.danilopianini.git-sensitive-semantic-versioning", version = "3.1.4" }
