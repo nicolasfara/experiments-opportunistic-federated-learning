@@ -39,12 +39,12 @@ class OpportunisticFederatedLearning
   }
   private val epochs = 2
   private val batch_size = 64
-  private val every = 3
+  private val every = 5
   private lazy val threshold = sense[Double](lossThreshold)
 
   override def main(): Any = {
-    rep((localModel, 1)) { case (model, tick) =>
-      val metric = actualMetric(model)
+    rep((localModel, localModel, 1)) { case (model, global, tick) =>
+      val metric = actualMetric(global)
       val isAggregator = S(
         threshold,
         metric = metric
@@ -69,7 +69,7 @@ class OpportunisticFederatedLearning
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
       node.put(Sensors.leaderId, leader)
-      node.put(Sensors.model, evolvedModel)
+      node.put(Sensors.model, model)
       if (isAggregator) { node.put(models, info) }
       node.put(Sensors.neighbourhoodMetric, neighbourhoodMetric)
       node.put(Sensors.isAggregator, isAggregator)
@@ -81,10 +81,11 @@ class OpportunisticFederatedLearning
         (
           // averageWeights(List(sample(evolvedModel), sample(sharedModel))),
           sharedModel,
+          sharedModel,
           tick + 1
         )
       } {
-        (evolvedModel, tick + 1)
+        (evolvedModel, sharedModel, tick + 1)
       }
     }
   }
@@ -186,7 +187,7 @@ class OpportunisticFederatedLearning
   def findParentWithMetric(potential: Double, metric: () => Double): ID = {
     val others =
       excludingSelf.reifyField((potential - nbr(potential)).similarTo(metric()))
-    mux(potential == 0.0) {
+    mux(potential.similarTo(0)) {
       Int.MaxValue
     } {
       others.find(_._2).map(_._1).getOrElse(Int.MaxValue)
