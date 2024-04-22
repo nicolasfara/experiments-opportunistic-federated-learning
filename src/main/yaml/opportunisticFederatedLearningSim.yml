@@ -42,8 +42,8 @@ seeds:
   simulation: *seed
 
 network-model:
-  type: ConnectWithinDistance
-  parameters: [1.5]
+  type: ConnectWithinDistanceAndPhenomena
+  parameters: [1.5, 1]
 
 _gradient: &gradient
   - time-distribution:
@@ -66,14 +66,19 @@ environment:
       parameters: [*seed, *areas, *dataShuffle, *dataFraction]
 
 deployments:
-  type: Grid
-  parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
-  contents:
-    - molecule: Seed
-      concentration: *seed
-    - molecule: LossThreshold
-      concentration: *lossThreshold
-  programs: *gradient
+  - type: Grid
+    parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
+    contents:
+      - molecule: Seed
+        concentration: *seed
+      - molecule: LossThreshold
+        concentration: *lossThreshold
+    programs: *gradient
+  - type: PhenomenaDistribution
+    parameters: [0, 0, *longSideNodes, *shortSideNodes, 2, 1]
+    contents:
+      - molecule: Phenomena
+        concentration: true
 
 terminate:
   type: AfterTime
