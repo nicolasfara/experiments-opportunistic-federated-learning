@@ -83,6 +83,7 @@ export:
       - type: AreaCountExporter
       - type: AreaCorrectnessExporter
       - type: AverageLossExporter
+      - type: AverageAccuracyExporter
       - type: AreaDiscrepancyExporter
         parameters: [*areas]
       - molecule: TrainLoss
