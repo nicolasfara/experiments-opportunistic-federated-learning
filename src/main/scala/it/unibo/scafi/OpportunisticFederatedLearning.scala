@@ -79,7 +79,8 @@ class OpportunisticFederatedLearning
       node.put("parent", findParentWithMetric(potential, metric))
       mux(impulsesEvery(tick)) {
         (
-          averageWeights(List(sample(evolvedModel), sample(sharedModel))),
+          // averageWeights(List(sample(evolvedModel), sample(sharedModel))),
+          sharedModel,
           tick + 1
         )
       } {
