@@ -11,11 +11,12 @@ class ConnectWithinDistanceAndPhenomena<T, P : Position<P>>(
     radius: Double,
     private val nearestPhenomenaConnections: Int,
 ) : ConnectWithinDistance<T, P>(radius) {
+    private val phenomenaMolecule = SimpleMolecule("Phenomena")
     override fun computeNeighborhood(center: Node<T>, environment: Environment<T, P>): Neighborhood<T> {
-        val phenomenaNodes = environment.nodes.filter { it.contains(SimpleMolecule("Phenomena")) }
+        val phenomenaNodes = environment.nodes.filter { it.contains(phenomenaMolecule) }
         return when {
-            center.contains(SimpleMolecule("Phenomena")) -> {
-                val simpleNodes = environment.nodes.filter { !it.contains(SimpleMolecule("Phenomena")) }
+            center.contains(phenomenaMolecule) -> {
+                val simpleNodes = environment.nodes.filter { !it.contains(phenomenaMolecule) }
                 val associations = simpleNodes.associateWith { n ->
                     phenomenaNodes.map { p -> p to environment.getDistanceBetweenNodes(p, n) }
                 }.mapValues { (_, values) -> values.minBy { it.second } }
