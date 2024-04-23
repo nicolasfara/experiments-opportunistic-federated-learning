@@ -1,3 +1,41 @@
+## [1.4.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.3.0...1.4.0) (2024-04-23)
+
+
+### Features
+
+* add baseline sim alchemist specification ([3fd7b4f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/3fd7b4f7df9698c8d7be03af4fe8524e578b32ca))
+* add centralized FL alchemist specification ([7162c52](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/7162c524ce89eedfd2de3cbc83825370ea1a1597))
+* add correct C ([fd48068](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/fd480685ea3a5034e16888882e8a6b01b05e9e0c))
+* add discrepancy as metric ([068e086](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/068e086a8e409ca7272824648ee9d974c0b3f49c))
+* add first version of CentralLearner global reaction ([4101beb](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4101beb0c1ea6b54c093e7bfb4908870f4433c42))
+* implement average accuracy per area metric ([c4713ac](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/c4713ac9b1f6423b74fddbf61ad20ec6c6210d31))
+* implement baseline client ([3d92f1c](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/3d92f1c313f817b8a313dc2b9cc9b04b775c799a))
+* implement central learner reaction ([4890c5e](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/4890c5e794824abde85e31d4b7e040a399df0859))
+* implement model init reaction ([dc8652d](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/dc8652dcf1eb7fcf863b0e3599ee5ee59e6e2006))
+* smaller cnn ([d367e4b](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/d367e4b097dadec9d90d6c88950e40136af255c2))
+* using area model as a way to understand area (dangerous, it could lead to oscillations ([830f363](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/830f3637e97930490b4aa43a96cff03714c78c11))
+* working version for area discrepancy ([a6dcbc4](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/a6dcbc4d88ca47957c92a23dc1ccd2a9ce86e25c))
+
+
+### Bug Fixes
+
+* **CentralLearnerReaction:** add skip first tick ([c8e59ec](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/c8e59ecbb36c2b854b926b5a2a8264b7a770ec6a))
+* **CentralLearnerReaction:** fix set concentration ([b47fb9f](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b47fb9f363d21687758739938c508635ec655fb6))
+* fix data export ([e56ee35](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/e56ee35fd380ddc18593d559b93fa6744e07d11f))
+* fix name in molecule name ([58db078](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/58db0788ab64ba20112e97681dc5dd10ea74ff3b))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.3 ([7be6667](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/7be666794d2ffc3937a90bc9ed462064715c0d79))
+* **deps:** update actions/download-artifact action to v4.1.6 ([6f12736](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/6f127366af265cf402a64a47671304c60803f23d))
+* **deps:** update actions/upload-artifact action to v4.3.3 ([3c4bfd2](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/3c4bfd27100581b1d29f12a6d9205a7fe6dbe19b))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.3.0 [skip ci] ([3f1c692](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/3f1c6926e42f1b006adeeb46a4ea31909a0b1487))
+
 ## [1.3.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.2.0...1.3.0) (2024-04-19)
 
 
