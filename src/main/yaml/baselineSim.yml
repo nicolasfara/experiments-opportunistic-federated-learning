@@ -17,23 +17,16 @@ variables:
     type: ArbitraryVariable
     parameters: [true, [true, false]]
   dataFraction: &dataFraction
-    formula: 0.1
+    formula: 0.2
   clientFraction: &clientFraction
-    formula: 0.5
+    formula: 1
   longSideNodes: &longSideNodes
     formula: 4
   shortSideNodes: &shortSideNodes
     formula: 3
   totalNodes: &totalNodes
     formula: longSideNodes * shortSideNodes
-  initNN: &initNN
-    language: scala
-    formula: |
-      import it.unibo.scafi.interop.PythonModules.utils
-      utils.init_cnn(seed.asInstanceOf[Double].toInt)
-  lossThreshold: &lossThreshold
-    type: ArbitraryVariable
-    parameters: [120.0, [60.0, 80.0, 100.0, 120.0, 150.0]]
+
 seeds:
   scenario: *seed
   simulation: *seed
@@ -47,7 +40,7 @@ _gradient: &gradient
     type: Event
     actions:
       - type: RunScafiProgram
-        parameters: [it.unibo.scafi.CentralizedFederatedLearning, *retentionTime]
+        parameters: [it.unibo.scafi.BaselineClient, *retentionTime]
   - program: send
 
 environment:
@@ -58,8 +51,13 @@ environment:
         type: Trigger
         parameters: [ 0 ]
       type: DataDistributionReaction
-      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
-    - time-distribution: 1 #TODO - check
+      parameters: [*seed, 4, *dataShuffle, *dataFraction]
+    - time-distribution:
+        type: Trigger
+        parameters: [ 0 ]
+      type: ModelInitializationReaction
+      parameters: [*seed]
+    - time-distribution: 0.5 #TODO - check
       type: CentralLearnerReaction
       parameters: [*seed, *clientFraction]
 
@@ -69,8 +67,6 @@ deployments:
   contents:
     - molecule: Seed
       concentration: *seed
-    - molecule: LossThreshold
-      concentration: *lossThreshold
   programs: *gradient
 
 terminate:
@@ -82,7 +78,7 @@ export:
     parameters:
       fileNameRoot: "experiment"
       interval: 1.0
-      exportPath: "data"
+      exportPath: "data-baseline"
     data:
       - time
       - molecule: TrainLoss
