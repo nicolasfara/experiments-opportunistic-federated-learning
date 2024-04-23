@@ -10,6 +10,11 @@ variables:
     max: 10
     step: 1
     default: 7
+  repetition: &repetition
+    min: 0
+    max: 10
+    step: 1
+    default: 1
   areas: &areas
     type: ArbitraryVariable
     parameters: [2, [2, 4]]
@@ -31,7 +36,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   lossThreshold: &lossThreshold
     type: ArbitraryVariable
-    parameters: [120.0, [60.0, 80.0, 100.0, 120.0, 150.0]]
+    parameters: [20.0, [20, 40, 80, 120]]
 seeds:
   scenario: *seed
   simulation: *seed
@@ -41,7 +46,9 @@ network-model:
   parameters: [1.5]
 
 _gradient: &gradient
-  - time-distribution: 1
+  - time-distribution:
+      type: DiracComb
+      parameters: [ 0.1, 1 ]
     type: Event
     actions:
       - type: RunScafiProgram
@@ -70,7 +77,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 100
+  parameters: 40
 
 export:
   - type: CSVExporter

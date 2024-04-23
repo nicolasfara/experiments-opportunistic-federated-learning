@@ -5,6 +5,7 @@ import interop.PythonModules._
 import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import Sensors._
+import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
 
 /** Metriche loss media per ogni area / set di etichette (nico) --
   * validation/test loss [X] loss globale (nico) accuracy media per ogni area
@@ -29,10 +30,14 @@ class OpportunisticFederatedLearning
 
   private lazy val localModel = utils.cnn_loader(seed())
   private lazy val data = utils.get_dataset(indexes())
+  private lazy val (trainData, valData) = splitDataset()
+  private val boundedInt: Builtins.Bounded[ID] = Builtins.Bounded.of_i
+  private val boundedDouble: Builtins.Bounded[Double] = Builtins.Bounded.of_d
+  implicit val boundedOfTuple: ScafiIncarnationForAlchemist.Builtins.Bounded[(Double, Int, Double, Double)] = Builtins.Bounded.tupleBounded4(boundedDouble, boundedInt, boundedDouble, boundedDouble)
   private def actualMetric: (py.Dynamic) => () => Double = (model) => {
     val models = includingSelf.reifyField(nbr(model))
     val evaluations = models.map { case (id, model) =>
-      id -> evalModel(model, data)._2
+      id -> evalModel(model, trainData)._2
     }
     val neighEvals = includingSelf.reifyField(nbr(evaluations))
     () => accuracyBasedMetric(neighEvals)
@@ -43,49 +48,51 @@ class OpportunisticFederatedLearning
   private lazy val threshold = sense[Double](lossThreshold)
 
   override def main(): Any = {
-    rep((localModel, localModel, 1)) { case (model, global, tick) =>
+    rep((localModel, localModel, 1)) { case (local, global, tick) =>
       val metric = actualMetric(global)
       val isAggregator = S(
         threshold,
         metric = metric
       )
-      val (trainData, valData) = splitDataset()
-      val (evolvedModel, trainLoss) = localTraining(model, trainData)
+      val (evolvedModel, trainLoss) = localTraining(local, trainData)
       val (validationAccuracy, validationLoss) =
         evalModel(evolvedModel, valData)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
       val potential = classicGradient(isAggregator, metric)
+      val sender = G_along(potential, metric, mid(), (_: ID) => nbr(mid()))
       val leader = broadcast(isAggregator, mid(), metric)
-      val info = CWithMetric[List[py.Dynamic]](
-        potential,
+      val info = CWithSenderField[List[py.Dynamic]](
         _ ++ _,
         List(evolvedModel),
         List.empty,
-        metric
+        sender
       )
-      node.put("potential", potential)
-      val aggregatedModel = averageWeights(info.map(sample))
+      val aggregatedModel = averageWeights(info, List.fill(info.length)(1.0))
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
       node.put(Sensors.leaderId, leader)
-      node.put(Sensors.model, model)
+      node.put(Sensors.model, local)
       if (isAggregator) { node.put(models, info) }
+      node.put(Sensors.potential, potential)
+      node.put(Sensors.modelsCount, info.length)
       node.put(Sensors.neighbourhoodMetric, neighbourhoodMetric)
       node.put(Sensors.isAggregator, isAggregator)
       node.put(Sensors.trainLoss, trainLoss)
       node.put(Sensors.validationLoss, validationLoss)
       node.put(Sensors.validationAccuracy, validationAccuracy)
-      node.put("parent", findParentWithMetric(potential, metric))
+      node.put(Sensors.parent, findParentWithMetric(potential, metric))
+      node.put(Sensors.sender, sender)
       mux(impulsesEvery(tick)) {
         (
-          // averageWeights(List(sample(evolvedModel), sample(sharedModel))),
-          sharedModel,
-          sharedModel,
+          averageWeights(List(evolvedModel, sharedModel), List(0.1, 0.9)),
+          averageWeights(List(evolvedModel, sharedModel), List(0.1, 0.9)),
           tick + 1
         )
       } {
-        (evolvedModel, sharedModel, tick + 1)
+        (evolvedModel,
+          averageWeights(List(evolvedModel, sharedModel), List(0.9, 0.1)),
+          tick + 1)
       }
     }
   }
@@ -94,7 +101,7 @@ class OpportunisticFederatedLearning
       model: py.Dynamic,
       trainData: py.Dynamic
   ): (py.Dynamic, Double) = {
-    val result = utils.local_training(model, epochs, trainData, batch_size)
+    val result = utils.local_training(model, epochs, trainData, batch_size, seed())
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
     val freshNN = utils.cnn_loader(seed())
@@ -114,9 +121,9 @@ class OpportunisticFederatedLearning
   private def sample(model: py.Dynamic): py.Dynamic =
     model.state_dict()
 
-  private def averageWeights(models: List[py.Dynamic]): py.Dynamic = {
+  private def averageWeights(models: List[py.Dynamic], weights: List[Double]): py.Dynamic = {
     val averageWeights =
-      utils.average_weights(models.toPythonProxy)
+      utils.average_weights(models.map(sample).toPythonProxy, weights.toPythonProxy)
     val freshNN = utils.cnn_loader(seed())
     freshNN.load_state_dict(averageWeights)
     freshNN
@@ -126,7 +133,7 @@ class OpportunisticFederatedLearning
       myModel: py.Dynamic,
       validationData: py.Dynamic
   ): (Double, Double) = {
-    val result = utils.evaluate(myModel, validationData, batch_size)
+    val result = utils.evaluate(myModel, validationData, batch_size, seed())
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
     (accuracy, loss)
@@ -160,7 +167,7 @@ class OpportunisticFederatedLearning
   private def impulsesEvery(time: Int): Boolean = time % every == 0
 
   private def splitDataset(): (py.Dynamic, py.Dynamic) = {
-    val datasets = utils.train_val_split(data)
+    val datasets = utils.train_val_split(data, seed())
     val trainData = py"$datasets[0]"
     val valData = py"$datasets[1]"
     (trainData, valData)
@@ -184,6 +191,22 @@ class OpportunisticFederatedLearning
       )
     }
 
+  def CWithSenderField[V](
+   acc: (V, V) => V,
+   local: V,
+   Null: V,
+   parentField: ID
+ ): V = share(local) { case (_, query) =>
+    acc(
+      local,
+      foldhoodPlus(Null)(acc) {
+        mux(nbr(parentField) == mid()) {
+          query()
+        } { nbr(Null) }
+      }
+    )
+  }
+
   def findParentWithMetric(potential: Double, metric: () => Double): ID = {
     val others =
       excludingSelf.reifyField((potential - nbr(potential)).similarTo(metric()))
@@ -199,4 +222,28 @@ class OpportunisticFederatedLearning
       d < (other + precision) && other < (d + precision)
   }
 
+  override def flexGradient(epsilon: Double = DEFAULT_FLEX_CHANGE_TOLERANCE_EPSILON,
+                   delta: Double = DEFAULT_FLEX_DELTA,
+                   communicationRadius: Double = DEFAULT_FLEX_DELTA)
+                  (source: Boolean,
+                   metric: Metric = nbrRange
+                  ): Double =
+    share(Double.PositiveInfinity){ case (local, query) =>
+      import Builtins.Bounded._ // for min/maximizing over tuplesù
+      def distance = Math.max(metric(), delta * communicationRadius)
+      val maxLocalSlope: (Double, ID, Double, Double) =
+        maxHood { ((local - query()) / distance, nbr{ mid }, query(), metric()) }
+      val constraint = minHoodPlus{ (query() + distance) }
+      mux(source){ 0.0 }{
+        if(Math.max(communicationRadius, 2 * constraint) < local) {
+          constraint
+        } else if(maxLocalSlope._1 > 1 + epsilon) {
+          maxLocalSlope._3 + (1 + epsilon) * Math.max(delta * communicationRadius, maxLocalSlope._4)
+        } else if(maxLocalSlope._1 < 1 - epsilon){
+          maxLocalSlope._3 + (1 - epsilon) * Math.max(delta * communicationRadius, maxLocalSlope._4)
+        } else {
+          local
+        }
+      }
+    }
 }

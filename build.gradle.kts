@@ -178,7 +178,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                 """
                     launcher: {
                         parameters: {
-                            batch: [ seed ],
+                            batch: [ repetition ],
                             showProgress: true,
                             autoStart: true,
                             parallelism: 1,

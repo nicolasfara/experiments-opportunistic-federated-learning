@@ -42,7 +42,7 @@ class DatasetSplit(Dataset):
         image, label = self.dataset[self.idxs[item]]
         return torch.tensor(image), torch.tensor(label)
 
-def average_weights(models):
+def average_weights(models, weigths):
     """ Averages the weights
 
     Args:
@@ -52,10 +52,14 @@ def average_weights(models):
         state_dict: the average state_dict
     """
     w_avg = copy.deepcopy(models[0])
+
     for key in w_avg.keys():
-        for i in range(1, len(models)):
-            w_avg[key] += models[i][key]
-        w_avg[key] = torch.div(w_avg[key], len(models))
+        w_avg[key] = torch.mul(w_avg[key], 0.0)
+    sum_weights = sum(weigths)
+    for key in w_avg.keys():
+        for i in range(0, len(models)):
+            w_avg[key] += models[i][key] * weigths[i]
+        w_avg[key] = torch.div(w_avg[key], sum_weights)
     return w_avg
 
 
@@ -135,7 +139,8 @@ def cnn_loader(seed):
     model.load_state_dict(torch.load(f'networks/initial_model_seed_{seed}'))
     return model
 
-def local_training(model, epochs, data, batch_size):
+def local_training(model, epochs, data, batch_size, seed):
+    torch.manual_seed(seed)
     criterion = nn.NLLLoss()
     model.train()
     epoch_loss = []
@@ -154,7 +159,8 @@ def local_training(model, epochs, data, batch_size):
         epoch_loss.append(mean_epoch_loss)
     return model.state_dict(), sum(epoch_loss) / len(epoch_loss)
 
-def evaluate(model, data, batch_size):
+def evaluate(model, data, batch_size, seed):
+    torch.manual_seed(seed)
     criterion = nn.NLLLoss()
     model.eval()
     loss, total, correct = 0.0, 0.0, 0.0
@@ -172,7 +178,8 @@ def evaluate(model, data, batch_size):
     accuracy = correct / total
     return accuracy, loss
     
-def train_val_split(data):
+def train_val_split(data, seed):
+    torch.manual_seed(seed)
     train_size = int(len(data) * 0.8)
     validation_size = len(data) - train_size
     train_set, val_set = random_split(data, [train_size, validation_size])
