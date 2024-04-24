@@ -1,3 +1,26 @@
+## [1.5.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.4.1...1.5.0) (2024-04-24)
+
+
+### Features
+
+* change connection linking rule ([5147fdd](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/5147fdd05d2d1f889a5cf02c7b324a6c8f5af36f))
+* update the phenomena distribution using a spatial grid ([fd300bb](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/fd300bba113e2ddac23ec64e74568959181c0a86))
+
+
+### Bug Fixes
+
+* trigger linking rule at startup ([38a0eff](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/38a0efffd781d2532cf9aa78bad1953848934a8d))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.4.1 [skip ci] ([2491caf](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/2491cafeec577fa3978392e0e2cd027064958040))
+
+
+### Refactoring
+
+* define molecule in a single place ([97f1067](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/97f1067786e59bd01d91fe1fa174df71170f1082))
+
 ## [1.4.1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.4.0...1.4.1) (2024-04-24)
 
 
