@@ -5,8 +5,9 @@ object Sensors {
   val isAggregator = "IsAggregator"
 
   val seed = "Seed"
-//  val data = "Data"
-//  val labels = "Labels"
+  val data = "Data"
+  val dataSamples = "DataSamples"
+  val dataIndexes = "DataIndexes"
   val phenomena = "Phenomena"
   val areaId = "AreaId"
 

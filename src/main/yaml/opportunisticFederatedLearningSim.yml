@@ -19,7 +19,7 @@ variables:
     type: ArbitraryVariable
     parameters: [2, [2, 4]]
   samplePerArea: &samplePerArea
-    formula: 10
+    formula: 4
   dataShuffle: &dataShuffle
     type: ArbitraryVariable
     parameters: [true, [true, false]]
