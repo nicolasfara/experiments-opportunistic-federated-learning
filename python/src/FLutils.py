@@ -101,33 +101,30 @@ def get_dataset(indexes):
     return dataset
 
 
-def dataset_to_nodes_partitioning(nodes_count: int, areas: int, random_seed: int, shuffling: bool = False, data_fraction = 1.0):
+def dataset_to_nodes_partitioning(areas: int, random_seed: int, shuffling: bool = False, data_fraction = 1.0):
     np.random.seed(random_seed)  # set seed from Alchemist to make the partitioning deterministic
     apply_transform = transforms.ToTensor()
 
     train_dataset = datasets.MNIST(dataset_download_path, train=True, download=True, transform=apply_transform)
 
-    nodes_per_area = int(nodes_count / areas)
+    # nodes_per_area = int(nodes_count / areas)
     dataset_labels_count = len(train_dataset.classes)
-    split_nodes_per_area = np.array_split(np.arange(nodes_count), areas)
+    # split_nodes_per_area = np.array_split(np.arange(nodes_count), areas)
     split_classes_per_area = np.array_split(np.arange(dataset_labels_count), areas)
-    nodes_and_classes = zip(split_nodes_per_area, split_classes_per_area)
 
-    index_mapping = {}
+    index_mapping = {}  # area_id -> list((record_id, label))
 
-    for index, (nodes, classes) in enumerate(nodes_and_classes):
-        records_per_class = [index for index, (_, lab) in enumerate(train_dataset) if lab in classes]
+    for index, classes in enumerate(split_classes_per_area):
+        records_per_class = [(index, lab) for index, (_, lab) in enumerate(train_dataset) if lab in classes]
         # intra-class shuffling
         if shuffling:
             np.random.shuffle(records_per_class)
-        split_record_per_node = np.array_split(records_per_class, nodes_per_area)
-        for node in nodes:
-            list = split_record_per_node[node % nodes_per_area].tolist()
-            bound = int(len(list) * data_fraction)
-            indexes = np.random.choice(len(list), bound)
-            index_mapping[node] = (np.array(list)[indexes].tolist(), classes.tolist())
+        bound = int(len(records_per_class) * data_fraction)
+        split_classes_per_area[index] = records_per_class[:bound]
+        index_mapping[index] = split_classes_per_area[index]
 
     return index_mapping
+
 
 def init_cnn(seed):
     torch.manual_seed(seed)

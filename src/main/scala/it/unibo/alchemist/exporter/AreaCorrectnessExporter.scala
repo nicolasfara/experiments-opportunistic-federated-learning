@@ -11,7 +11,8 @@ import java.{lang, util}
 class AreaCorrectnessExporter extends AbstractDoubleExporter {
 
   private lazy val leaderMolecule = Sensors.leaderId
-  private lazy val labelsMolecule = Sensors.labels
+  private lazy val areaIdMolecule = Sensors.areaId
+//  private lazy val labelsMolecule = Sensors.labels
 
   override def getColumnNames: util.List[String] =
     util.List.of("AreaCorrectness")
@@ -25,14 +26,16 @@ class AreaCorrectnessExporter extends AbstractDoubleExporter {
     val nodes = environment.getNodesAsScala
     val areasCorrectness = nodes
       .map(node => new SimpleNodeManager[T](node))
-      .map(node => (node.get[Int](leaderMolecule), node.getOrElse(labelsMolecule, Set.empty[Int])))
+      .map(node => node.get[Int](leaderMolecule) -> node.get[Int](areaIdMolecule))
       .groupBy(_._1)
-      .map { case (leaderId, labels) => leaderId -> labels.flatMap(_._2).toSet }
-      .map { case (leaderId, labels) => getLeaderLabels(environment.getNodeByID(leaderId), labels, labelsMolecule) }
+      .map { case (leaderId, values) => leaderId -> values.map(_._2) }
+      .map { case (leaderId, areaIds) => leaderId -> (environment.getNodeByID(leaderId).getConcentration(areaIdMolecule).asInstanceOf[Int], areaIds) }
+      .map { case (_, (areaId, areaIds)) => areaIds.foldLeft(0)((acc, elem) => if (elem == areaId) acc else acc + 1) }
+      .sum
 
     util.Map.of(
       "AreaCorrectness",
-      areasCorrectness.values.sum / areasCorrectness.size
+      areasCorrectness.toDouble
     )
   }
 

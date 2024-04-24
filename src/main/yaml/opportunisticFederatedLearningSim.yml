@@ -18,6 +18,8 @@ variables:
   areas: &areas
     type: ArbitraryVariable
     parameters: [2, [2, 4]]
+  samplePerArea: &samplePerArea
+    formula: 10
   dataShuffle: &dataShuffle
     type: ArbitraryVariable
     parameters: [true, [true, false]]
@@ -55,15 +57,20 @@ _gradient: &gradient
         parameters: [it.unibo.scafi.OpportunisticFederatedLearning, *retentionTime]
   - program: send
 
-environment:
-  type: Continuous2DEnvironment
-  parameters: [ ]
-  global-programs:
-    - time-distribution:
-        type: Trigger
-        parameters: [ 0 ]
-      type: DataDistributionReaction
-      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
+#environment:
+#  type: Continuous2DEnvironment
+#  parameters: [ ]
+#  global-programs:
+#    - time-distribution:
+#        type: Trigger
+#        parameters: [ 0 ]
+#      type: DataDistributionReaction
+#      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
+
+layers:
+  - type: PhenomenaDistribution
+    parameters: [ 0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed ]
+    molecule: Phenomena
 
 deployments:
   - type: Grid
@@ -74,11 +81,6 @@ deployments:
       - molecule: LossThreshold
         concentration: *lossThreshold
     programs: *gradient
-  - type: PhenomenaDistribution
-    parameters: [0, 0, *longSideNodes, *shortSideNodes, 2, 1]
-    contents:
-      - molecule: Phenomena
-        concentration: true
 
 terminate:
   type: AfterTime
@@ -108,4 +110,3 @@ export:
       - molecule: ValidationAccuracy
         aggregators: [min, max, mean, variance]
         value-filter: onlyfinite
-        
