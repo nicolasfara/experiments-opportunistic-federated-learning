@@ -1,3 +1,16 @@
+## [1.4.1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.4.0...1.4.1) (2024-04-24)
+
+
+### Bug Fixes
+
+* solve stochasticy ([43acbb9](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/43acbb9fa1bb553c86f560f1da96f2be54a7a105))
+
+
+### General maintenance
+
+* modify some parameters to check performance vs centralized approoachQ ([0002c0b](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/0002c0bd04bb8eb678276cdff2e0d9e98b036914))
+* **release:** update gradle.properties .env versions to 1.4.0 [skip ci] ([53baee7](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/53baee7dd6bc3cd581ec1c8fb6a2ad5264759e3c))
+
 ## [1.4.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.3.0...1.4.0) (2024-04-23)
 
 
