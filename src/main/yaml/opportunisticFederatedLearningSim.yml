@@ -9,7 +9,7 @@ variables:
     min: 0
     max: 10
     step: 1
-    default: 7
+    default: 1
   repetition: &repetition
     min: 0
     max: 10
@@ -36,7 +36,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   lossThreshold: &lossThreshold
     type: ArbitraryVariable
-    parameters: [20.0, [20, 40, 80, 120]]
+    parameters: [40.0, [20, 40, 80, 120]]
 seeds:
   scenario: *seed
   simulation: *seed
@@ -77,7 +77,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 40
+  parameters: 80
 
 export:
   - type: CSVExporter

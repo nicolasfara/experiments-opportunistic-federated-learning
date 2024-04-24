@@ -44,7 +44,7 @@ class OpportunisticFederatedLearning
   }
   private val epochs = 2
   private val batch_size = 64
-  private val every = 5
+  private val every = 3
   private lazy val threshold = sense[Double](lossThreshold)
 
   override def main(): Any = {
