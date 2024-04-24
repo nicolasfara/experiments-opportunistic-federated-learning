@@ -5,6 +5,7 @@ import interop.PythonModules._
 import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import Sensors._
+import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
 
 /** Metriche loss media per ogni area / set di etichette (nico) -- validation/test loss [X] loss globale (nico) [X]
@@ -25,8 +26,9 @@ class OpportunisticFederatedLearning
     with BuildingBlocks {
 
   private lazy val localModel = utils.cnn_loader(seed())
-  private lazy val data = utils.get_dataset(indexes())
-  private lazy val (trainData, valData) = splitDataset()
+  private def data = senseEnvData[Dataset](Sensors.phenomena)
+  def trainData = data.trainingData
+  def validationData = data.validationData
   private val boundedInt: Builtins.Bounded[ID] = Builtins.Bounded.of_i
   private val boundedDouble: Builtins.Bounded[Double] = Builtins.Bounded.of_d
   implicit val boundedOfTuple: ScafiIncarnationForAlchemist.Builtins.Bounded[(Double, Int, Double, Double)] = Builtins.Bounded.tupleBounded4(boundedDouble, boundedInt, boundedDouble, boundedDouble)
@@ -52,7 +54,7 @@ class OpportunisticFederatedLearning
       )
       val (evolvedModel, trainLoss) = localTraining(local, trainData)
       val (validationAccuracy, validationLoss) =
-        evalModel(evolvedModel, valData)
+        evalModel(evolvedModel, validationData)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
       val potential = classicGradient(isAggregator, metric)
       val sender = G_along(potential, metric, mid(), (_: ID) => nbr(mid()))
@@ -63,17 +65,14 @@ class OpportunisticFederatedLearning
         List.empty,
         sender
       )
-      node.put("potential", potential)
-
-      val (areaId, _) = senseEnvData[(Int, List[Int])](Sensors.phenomena)
-      node.put(Sensors.areaId, areaId)
-
+      val areaId = data.areaId
       val aggregatedModel = averageWeights(info, List.fill(info.length)(1.0))
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
       node.put(Sensors.leaderId, leader)
       node.put(Sensors.model, local)
+      node.put(Sensors.areaId, areaId)
       if (isAggregator) { node.put(models, info) }
       node.put(Sensors.potential, potential)
       node.put(Sensors.modelsCount, info.length)
@@ -167,13 +166,6 @@ class OpportunisticFederatedLearning
     senseEnvData[(Int, List[Int])](Sensors.phenomena)._2.toPythonProxy // node.get[List[Int]](Sensors.data).toPythonProxy
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
-
-  private def splitDataset(): (py.Dynamic, py.Dynamic) = {
-    val datasets = utils.train_val_split(data, seed())
-    val trainData = py"$datasets[0]"
-    val valData = py"$datasets[1]"
-    (trainData, valData)
-  }
 
   def CWithMetric[V](
       potential: Double,

@@ -111,7 +111,7 @@ def dataset_to_nodes_partitioning(areas: int, random_seed: int, shuffling: bool 
     dataset_labels_count = len(train_dataset.classes)
     # split_nodes_per_area = np.array_split(np.arange(nodes_count), areas)
     split_classes_per_area = np.array_split(np.arange(dataset_labels_count), areas)
-
+    print(f"split_classes_per_area: {split_classes_per_area}")
     index_mapping = {}  # area_id -> list((record_id, label))
 
     for index, classes in enumerate(split_classes_per_area):
@@ -125,7 +125,8 @@ def dataset_to_nodes_partitioning(areas: int, random_seed: int, shuffling: bool 
 
     return index_mapping
 
-
+result = dataset_to_nodes_partitioning(2, 42, True, 0.2)
+print(len(result[0]))
 def init_cnn(seed):
     torch.manual_seed(seed)
     model = CNNMnist()

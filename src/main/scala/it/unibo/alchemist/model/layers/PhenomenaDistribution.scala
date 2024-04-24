@@ -2,6 +2,8 @@ package it.unibo.alchemist.model.layers
 
 import it.unibo.alchemist.model._
 import it.unibo.scafi.interop.PythonModules
+import me.shadaj.scalapy.py
+import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 
 class PhenomenaDistribution[P <: Position[P]](
     environment: Environment[_, P],
@@ -9,17 +11,22 @@ class PhenomenaDistribution[P <: Position[P]](
     private val yStart: Double,
     private val xEnd: Double,
     private val yEnd: Double,
-    private val areas: Int,
+    val areas: Int,
     private val samplesPerArea: Int,
     private val shuffle: Boolean = true,
     private val dataFraction: Double = 1.0,
     private val seed: Int
-) extends Layer[(Int, List[Int]), P] {
+) extends Layer[Dataset, P] {
 
   private lazy val phenomenaAreas: List[(P, P)] =
-    computeSubAreas(environment.makePosition(xStart, yStart), environment.makePosition(xEnd, yEnd), areas)
+    computeSubAreas(
+      environment.makePosition(xStart, yStart),
+      environment.makePosition(xEnd, yEnd),
+      areas
+    )
 
-  /** The key is the ID of the phenomena area, matching the [samplesPerArea] size
+  /** The key is the ID of the phenomena area, matching the [samplesPerArea]
+    * size
     */
   private lazy val splitLabelsAndIndices: Map[Int, List[(Int, Int)]] = {
     PythonModules.utils
@@ -27,14 +34,27 @@ class PhenomenaDistribution[P <: Position[P]](
       .as[Map[Int, List[(Int, Int)]]]
   }
 
-  private lazy val dataByPositions: Map[(P, Int), List[(Int, Int)]] = {
-    phenomenaAreas.zipWithIndex.flatMap { case ((startPoint, endPoint), areaIndex) =>
-      val positionsWithinArea = computeSubAreas(startPoint, endPoint, samplesPerArea).zipWithIndex
-      val dataPerArea = splitLabelsAndIndices(areaIndex).grouped(samplesPerArea).toList
-      positionsWithinArea.map { case (position, index) =>
-        val data = dataPerArea(index)
-        (center(position), areaIndex) -> data
-      }
+  lazy val dataByPositions: Map[P, Dataset] = {
+    phenomenaAreas.zipWithIndex.flatMap {
+      case ((startPoint, endPoint), areaIndex) =>
+        val positionsWithinArea =
+          computeSubAreas(startPoint, endPoint, samplesPerArea).zipWithIndex
+        val totalDataPerPoint =
+          splitLabelsAndIndices(areaIndex).size / samplesPerArea
+        val dataPerArea =
+          splitLabelsAndIndices(areaIndex).grouped(totalDataPerPoint).toList
+        positionsWithinArea.map { case (position, index) =>
+          val data = dataPerArea(index).map(_._1)
+          val split = PythonModules.utils.train_val_split(
+            PythonModules.utils.get_dataset(data.toPythonProxy),
+            seed
+          )
+          center(position) -> Dataset(
+            areaIndex,
+            py"${split}[0]",
+            py"${split}[1]"
+          )
+        }
     }.toMap
   }
 
@@ -65,7 +85,14 @@ class PhenomenaDistribution[P <: Position[P]](
     environment.makePosition(xCenter, yCenter)
   }
 
-  override def getValue(p: P): (Int, List[Int]) = dataByPositions
-    .map { case ((position, areaIndex), values) => (position.distanceTo(p), areaIndex) -> values.map(_._1) }
-    .minBy { case ((distance, _), _) => distance } match { case ((_, id), ids) => id -> ids }
+  override def getValue(p: P): Dataset = dataByPositions
+    .map { case (position, dataset) => position.distanceTo(p) -> dataset }
+    .minBy { case (distance, _) => distance }
+    ._2
 }
+
+case class Dataset(
+    areaId: Int,
+    trainingData: py.Dynamic,
+    validationData: py.Dynamic
+)
