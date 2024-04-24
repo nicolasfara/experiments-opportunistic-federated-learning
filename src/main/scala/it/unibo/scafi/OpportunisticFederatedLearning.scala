@@ -7,19 +7,15 @@ import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import Sensors._
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
 
-/** Metriche loss media per ogni area / set di etichette (nico) --
-  * validation/test loss [X] loss globale (nico) accuracy media per ogni area
-  * (nico) (di validation) accuracy globale (dom) divergenza (all'interno
-  * dell'area) -- gianlu corretteza della aree (i nodi che hanno lo stesso
-  * dataset sono nella stessa area) -- nico [X] convergenza (specifico sul
-  * movimento) -- io accuracy + loss su test -- dom
+/** Metriche loss media per ogni area / set di etichette (nico) -- validation/test loss [X] loss globale (nico) [X]
+  * accuracy media per ogni area (nico) (di validation) [X] accuracy globale (dom) divergenza (all'interno dell'area) --
+  * gianlu corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico [X] convergenza
+  * (specifico sul movimento) -- io accuracy + loss su test -- dom
   *
-  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss
-  * per ogni nodo (davide) posizionamento del dato in base alla posizione
-  * spaziale (idea: fare una griglia di nodi che non eseguono il programma ma
-  * servono solo per posizionare i dati e poi usi 1-nn search per trovare i
-  * dati) -- nico usare più aree (io) usare aree fuzzy (k=2) -- gianlu movimento
-  * di un nodo -- gianlu con più nodi (???) -- gianlu
+  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss per ogni nodo (davide) posizionamento del
+  * dato in base alla posizione spaziale (idea: fare una griglia di nodi che non eseguono il programma ma servono solo
+  * per posizionare i dati e poi usi 1-nn search per trovare i dati) -- nico usare più aree (io) usare aree fuzzy (k=2)
+  * -- gianlu movimento di un nodo -- gianlu con più nodi (???) -- gianlu
   */
 class OpportunisticFederatedLearning
     extends AggregateProgram
@@ -67,6 +63,11 @@ class OpportunisticFederatedLearning
         List.empty,
         sender
       )
+      node.put("potential", potential)
+
+      val (areaId, _) = senseEnvData[(Int, List[Int])](Sensors.phenomena)
+      node.put(Sensors.areaId, areaId)
+
       val aggregatedModel = averageWeights(info, List.fill(info.length)(1.0))
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
@@ -162,7 +163,8 @@ class OpportunisticFederatedLearning
 
   private def seed(): Int = node.get[Double](Sensors.seed).toInt
 
-  private def indexes() = node.get[List[Int]](Sensors.data).toPythonProxy
+  private def indexes() =
+    senseEnvData[(Int, List[Int])](Sensors.phenomena)._2.toPythonProxy // node.get[List[Int]](Sensors.data).toPythonProxy
 
   private def impulsesEvery(time: Int): Boolean = time % every == 0
 

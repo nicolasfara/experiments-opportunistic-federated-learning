@@ -23,7 +23,7 @@ class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
   ): util.Map[String, lang.Double] = {
     val nodes = environment.getNodesAsScala.map(_.manager)
     val nodesPerAreas =
-      nodes.groupBy(node => node.getOrElse(Sensors.labels, Set.empty[Int]))
+      nodes.groupBy(node => node.get[Int](Sensors.areaId))
     val areasWithMeanDiscrepancy = nodesPerAreas
       .map { case (areas, nodes) =>
         areas -> (nodes.minBy(_.node.getId) -> nodes)
