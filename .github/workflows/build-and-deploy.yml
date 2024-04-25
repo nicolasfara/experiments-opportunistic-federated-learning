@@ -15,7 +15,7 @@ jobs:
       cancel-in-progress: true
     steps:
     - name: Checkout
-      uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
     - uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.11'
@@ -33,7 +33,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout
-        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -64,7 +64,7 @@ jobs:
       cancel-in-progress: true
     steps:
     - name: Checkout
-      uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
     - name: Setup CI=true env variable inside docker-compose
       run: sed 's/CI:\s.*/CI:\ \"true\"/g' -i docker-compose.yml
     - name: Run compose
@@ -86,7 +86,7 @@ jobs:
       )
     steps:
       - name: Checkout
-        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
         with:
           submodules: recursive
           token: ${{ secrets.DEPLOYMENT_TOKEN }}
