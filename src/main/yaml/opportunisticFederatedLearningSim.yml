@@ -15,9 +15,18 @@ variables:
     max: 10
     step: 1
     default: 1
+  epochs: &epochs
+    type: ArbitraryVariable
+    parameters: [2, [2]]
+  aggregateLocalEvery: &aggregateLocalEvery
+    type: ArbitraryVariable
+    parameters: [ 3, [ 3, 5, 10 ] ]
   areas: &areas
     type: ArbitraryVariable
     parameters: [2, [2, 4]]
+  batchSize: &batchSize
+    type: ArbitraryVariable
+    parameters: [ 64, [ 64, 128 ] ]
   samplePerArea: &samplePerArea
     formula: 4
   dataShuffle: &dataShuffle
@@ -44,8 +53,8 @@ seeds:
   simulation: *seed
 
 network-model:
-  type: ConnectWithinDistanceAndPhenomena
-  parameters: [1.5, 1]
+  type: ConnectWithinDistance
+  parameters: [1.5]
 
 _gradient: &gradient
   - time-distribution:
@@ -80,6 +89,12 @@ deployments:
         concentration: *seed
       - molecule: LossThreshold
         concentration: *lossThreshold
+      - molecule: Epochs
+        concentration: *epochs
+      - molecule: AggregateLocalEvery
+        concentration: *aggregateLocalEvery
+      - molecule: BatchSize
+        concentration: *batchSize
     programs: *gradient
 
 terminate:

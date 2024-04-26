@@ -8,15 +8,19 @@ import Sensors._
 import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
 
-/** Metriche loss media per ogni area / set di etichette (nico) -- validation/test loss [X] loss globale (nico) [X]
-  * accuracy media per ogni area (nico) (di validation) [X] accuracy globale (dom) divergenza (all'interno dell'area) --
-  * gianlu corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico [X] convergenza
-  * (specifico sul movimento) -- io accuracy + loss su test -- dom
+/** Metriche loss media per ogni area / set di etichette (nico) --
+  * validation/test loss [X] loss globale (nico) [X] accuracy media per ogni
+  * area (nico) (di validation) [X] accuracy globale (dom) divergenza
+  * (all'interno dell'area) -- gianlu corretteza della aree (i nodi che hanno lo
+  * stesso dataset sono nella stessa area) -- nico [X] convergenza (specifico
+  * sul movimento) -- io accuracy + loss su test -- dom
   *
-  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss per ogni nodo (davide) posizionamento del
-  * dato in base alla posizione spaziale (idea: fare una griglia di nodi che non eseguono il programma ma servono solo
-  * per posizionare i dati e poi usi 1-nn search per trovare i dati) -- nico usare più aree (io) usare aree fuzzy (k=2)
-  * -- gianlu movimento di un nodo -- gianlu con più nodi (???) -- gianlu
+  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss
+  * per ogni nodo (davide) posizionamento del dato in base alla posizione
+  * spaziale (idea: fare una griglia di nodi che non eseguono il programma ma
+  * servono solo per posizionare i dati e poi usi 1-nn search per trovare i
+  * dati) -- nico usare più aree (io) usare aree fuzzy (k=2) -- gianlu movimento
+  * di un nodo -- gianlu con più nodi (???) -- gianlu
   */
 class OpportunisticFederatedLearning
     extends AggregateProgram
@@ -31,7 +35,14 @@ class OpportunisticFederatedLearning
   def validationData = data.validationData
   private val boundedInt: Builtins.Bounded[ID] = Builtins.Bounded.of_i
   private val boundedDouble: Builtins.Bounded[Double] = Builtins.Bounded.of_d
-  implicit val boundedOfTuple: ScafiIncarnationForAlchemist.Builtins.Bounded[(Double, Int, Double, Double)] = Builtins.Bounded.tupleBounded4(boundedDouble, boundedInt, boundedDouble, boundedDouble)
+  implicit val boundedOfTuple: ScafiIncarnationForAlchemist.Builtins.Bounded[
+    (Double, Int, Double, Double)
+  ] = Builtins.Bounded.tupleBounded4(
+    boundedDouble,
+    boundedInt,
+    boundedDouble,
+    boundedDouble
+  )
   private def actualMetric: (py.Dynamic) => () => Double = (model) => {
     val models = includingSelf.reifyField(nbr(model))
     val evaluations = models.map { case (id, model) =>
@@ -40,9 +51,10 @@ class OpportunisticFederatedLearning
     val neighEvals = includingSelf.reifyField(nbr(evaluations))
     () => accuracyBasedMetric(neighEvals)
   }
-  private val epochs = 2
-  private val batch_size = 64
-  private val every = 3
+
+  private lazy val epochs = sense[Int](Sensors.epochs)
+  private lazy val batch_size = sense[Int](Sensors.batchSize)
+  private lazy val aggregateLocalEvery = sense[Int](Sensors.aggregateLocalEvery)
   private lazy val threshold = sense[Double](lossThreshold)
 
   override def main(): Any = {
@@ -90,9 +102,11 @@ class OpportunisticFederatedLearning
           tick + 1
         )
       } {
-        (evolvedModel,
+        (
+          evolvedModel,
           averageWeights(List(evolvedModel, sharedModel), List(0.9, 0.1)),
-          tick + 1)
+          tick + 1
+        )
       }
     }
   }
@@ -101,7 +115,8 @@ class OpportunisticFederatedLearning
       model: py.Dynamic,
       trainData: py.Dynamic
   ): (py.Dynamic, Double) = {
-    val result = utils.local_training(model, epochs, trainData, batch_size, seed())
+    val result =
+      utils.local_training(model, epochs, trainData, batch_size, seed())
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
     val freshNN = utils.cnn_loader(seed())
@@ -121,9 +136,15 @@ class OpportunisticFederatedLearning
   private def sample(model: py.Dynamic): py.Dynamic =
     model.state_dict()
 
-  private def averageWeights(models: List[py.Dynamic], weights: List[Double]): py.Dynamic = {
+  private def averageWeights(
+      models: List[py.Dynamic],
+      weights: List[Double]
+  ): py.Dynamic = {
     val averageWeights =
-      utils.average_weights(models.map(sample).toPythonProxy, weights.toPythonProxy)
+      utils.average_weights(
+        models.map(sample).toPythonProxy,
+        weights.toPythonProxy
+      )
     val freshNN = utils.cnn_loader(seed())
     freshNN.load_state_dict(averageWeights)
     freshNN
@@ -162,10 +183,8 @@ class OpportunisticFederatedLearning
 
   private def seed(): Int = node.get[Double](Sensors.seed).toInt
 
-  private def indexes() =
-    senseEnvData[(Int, List[Int])](Sensors.phenomena)._2.toPythonProxy // node.get[List[Int]](Sensors.data).toPythonProxy
-
-  private def impulsesEvery(time: Int): Boolean = time % every == 0
+  private def impulsesEvery(time: Int): Boolean =
+    time % aggregateLocalEvery == 0
 
   def CWithMetric[V](
       potential: Double,
@@ -186,11 +205,11 @@ class OpportunisticFederatedLearning
     }
 
   def CWithSenderField[V](
-   acc: (V, V) => V,
-   local: V,
-   Null: V,
-   parentField: ID
- ): V = share(local) { case (_, query) =>
+      acc: (V, V) => V,
+      local: V,
+      Null: V,
+      parentField: ID
+  ): V = share(local) { case (_, query) =>
     acc(
       local,
       foldhoodPlus(Null)(acc) {
@@ -216,25 +235,32 @@ class OpportunisticFederatedLearning
       d < (other + precision) && other < (d + precision)
   }
 
-  override def flexGradient(epsilon: Double = DEFAULT_FLEX_CHANGE_TOLERANCE_EPSILON,
-                   delta: Double = DEFAULT_FLEX_DELTA,
-                   communicationRadius: Double = DEFAULT_FLEX_DELTA)
-                  (source: Boolean,
-                   metric: Metric = nbrRange
-                  ): Double =
-    share(Double.PositiveInfinity){ case (local, query) =>
+  override def flexGradient(
+      epsilon: Double = DEFAULT_FLEX_CHANGE_TOLERANCE_EPSILON,
+      delta: Double = DEFAULT_FLEX_DELTA,
+      communicationRadius: Double = DEFAULT_FLEX_DELTA
+  )(source: Boolean, metric: Metric = nbrRange): Double =
+    share(Double.PositiveInfinity) { case (local, query) =>
       import Builtins.Bounded._ // for min/maximizing over tuplesù
       def distance = Math.max(metric(), delta * communicationRadius)
       val maxLocalSlope: (Double, ID, Double, Double) =
-        maxHood { ((local - query()) / distance, nbr{ mid }, query(), metric()) }
-      val constraint = minHoodPlus{ (query() + distance) }
-      mux(source){ 0.0 }{
-        if(Math.max(communicationRadius, 2 * constraint) < local) {
+        maxHood {
+          ((local - query()) / distance, nbr { mid }, query(), metric())
+        }
+      val constraint = minHoodPlus { (query() + distance) }
+      mux(source) { 0.0 } {
+        if (Math.max(communicationRadius, 2 * constraint) < local) {
           constraint
-        } else if(maxLocalSlope._1 > 1 + epsilon) {
-          maxLocalSlope._3 + (1 + epsilon) * Math.max(delta * communicationRadius, maxLocalSlope._4)
-        } else if(maxLocalSlope._1 < 1 - epsilon){
-          maxLocalSlope._3 + (1 - epsilon) * Math.max(delta * communicationRadius, maxLocalSlope._4)
+        } else if (maxLocalSlope._1 > 1 + epsilon) {
+          maxLocalSlope._3 + (1 + epsilon) * Math.max(
+            delta * communicationRadius,
+            maxLocalSlope._4
+          )
+        } else if (maxLocalSlope._1 < 1 - epsilon) {
+          maxLocalSlope._3 + (1 - epsilon) * Math.max(
+            delta * communicationRadius,
+            maxLocalSlope._4
+          )
         } else {
           local
         }

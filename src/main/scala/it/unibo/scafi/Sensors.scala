@@ -6,8 +6,9 @@ object Sensors {
 
   val seed = "Seed"
   val data = "Data"
-  val dataSamples = "DataSamples"
-  val dataIndexes = "DataIndexes"
+  val batchSize = "BatchSize"
+  val epochs = "Epochs"
+  val aggregateLocalEvery = "AggregateLocalEvery"
   val phenomena = "Phenomena"
   val areaId = "AreaId"
 

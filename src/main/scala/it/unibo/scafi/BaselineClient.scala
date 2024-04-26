@@ -11,11 +11,10 @@ class BaselineClient
   with StandardSensors
   with ScafiAlchemistSupport{
 
-  private def data = senseEnvData[Dataset](Sensors.phenomena)
-  def trainData = data.trainingData
-  def validationData = data.validationData
-  private val epochs = 2
-  private val batch_size = 64
+  private lazy val data = utils.get_dataset(indexes())
+  private lazy val (trainData, validationData) = splitDataset()
+  private lazy val epochs = sense[Int](Sensors.epochs)
+  private lazy val batch_size = sense[Int](Sensors.batchSize)
 
   override def main(): Any = {
     val m = node.get[py.Dynamic]("Model")
@@ -24,6 +23,8 @@ class BaselineClient
     logMetrics(trainLoss, validationLoss, validationAccuracy)
     node.put("Model", evolvedModel)
   }
+
+  private def indexes() = node.get[List[Int]](Sensors.data).toPythonProxy
 
   private def seed(): Int = node.get[Double](Sensors.seed).toInt
 
@@ -51,6 +52,13 @@ class BaselineClient
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
     (accuracy, loss)
+  }
+
+  private def splitDataset(): (py.Dynamic, py.Dynamic) = {
+    val datasets = utils.train_val_split(data)
+    val trainData = py"$datasets[0]"
+    val valData = py"$datasets[1]"
+    (trainData, valData)
   }
 
 }
