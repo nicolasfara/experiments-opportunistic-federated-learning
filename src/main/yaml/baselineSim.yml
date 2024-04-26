@@ -21,9 +21,9 @@ variables:
   clientFraction: &clientFraction
     formula: 1
   longSideNodes: &longSideNodes
-    formula: 4
+    formula: 7
   shortSideNodes: &shortSideNodes
-    formula: 3
+    formula: 8
   totalNodes: &totalNodes
     formula: longSideNodes * shortSideNodes
 
@@ -36,7 +36,9 @@ network-model:
   parameters: [1.5]
 
 _gradient: &gradient
-  - time-distribution: 1 #TODO - check
+  - time-distribution:
+      type: DiracComb
+      parameters: [0.1, 1]
     type: Event
     actions:
       - type: RunScafiProgram
@@ -49,15 +51,17 @@ environment:
   global-programs:
     - time-distribution:
         type: Trigger
-        parameters: [ 0 ]
+        parameters: [0]
       type: DataDistributionReaction
-      parameters: [*seed, 4, *dataShuffle, *dataFraction]
+      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
     - time-distribution:
         type: Trigger
-        parameters: [ 0 ]
+        parameters: [0]
       type: ModelInitializationReaction
       parameters: [*seed]
-    - time-distribution: 0.5 #TODO - check
+    - time-distribution:
+        type: DiracComb
+        parameters: [0.2, 1]
       type: CentralLearnerReaction
       parameters: [*seed, *clientFraction]
 
