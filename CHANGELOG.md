@@ -1,3 +1,16 @@
+## [1.6.1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.6.0...1.6.1) (2024-04-26)
+
+
+### Bug Fixes
+
+* adjust area index ([7d5f279](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/7d5f279a85b05ae48abbf1a63c83ff4b6aa6b501))
+
+
+### General maintenance
+
+* put everything inside seeds ([8703c29](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/8703c2947a9656e46c00903857089bf408e24cc0))
+* **release:** update gradle.properties .env versions to 1.6.0 [skip ci] ([3baaa71](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/3baaa719c8db3ef540b19b7fe5dbaa5ad83f6c18))
+
 ## [1.6.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.5.0...1.6.0) (2024-04-26)
 
 
