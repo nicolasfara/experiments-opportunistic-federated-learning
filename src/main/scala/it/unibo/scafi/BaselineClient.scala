@@ -7,12 +7,13 @@ import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.{PyQuote, SeqConverters, local}
 
 class BaselineClient
-  extends AggregateProgram
-  with StandardSensors
-  with ScafiAlchemistSupport{
+    extends AggregateProgram
+    with StandardSensors
+    with ScafiAlchemistSupport {
 
-  private lazy val data = utils.get_dataset(indexes())
-  private lazy val (trainData, validationData) = splitDataset()
+  private def data = senseEnvData[Dataset](Sensors.phenomena)
+  def trainData = data.trainingData
+  def validationData = data.validationData
   private lazy val epochs = sense[Int](Sensors.epochs)
   private lazy val batch_size = sense[Int](Sensors.batchSize)
 
@@ -24,22 +25,25 @@ class BaselineClient
     node.put("Model", evolvedModel)
   }
 
-  private def indexes() = node.get[List[Int]](Sensors.data).toPythonProxy
-
   private def seed(): Int = node.get[Double](Sensors.seed).toInt
 
-  private def logMetrics(trainLoss: Double, validationLoss: Double, validationAccuracy: Double): Unit = {
+  private def logMetrics(
+      trainLoss: Double,
+      validationLoss: Double,
+      validationAccuracy: Double
+  ): Unit = {
     node.put(Sensors.trainLoss, trainLoss)
     node.put(Sensors.validationLoss, validationLoss)
     node.put(Sensors.validationAccuracy, validationAccuracy)
   }
 
   private def localTraining(
-     model: py.Dynamic
-   ): (py.Dynamic, Double) = {
+      model: py.Dynamic
+  ): (py.Dynamic, Double) = {
     val localModel = utils.cnn_loader(seed())
     localModel.load_state_dict(model)
-    val result = utils.local_training(localModel, epochs, trainData, batch_size, seed())
+    val result =
+      utils.local_training(localModel, epochs, trainData, batch_size, seed())
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
     (newWeights, trainLoss)
@@ -52,13 +56,6 @@ class BaselineClient
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
     (accuracy, loss)
-  }
-
-  private def splitDataset(): (py.Dynamic, py.Dynamic) = {
-    val datasets = utils.train_val_split(data)
-    val trainData = py"$datasets[0]"
-    val valData = py"$datasets[1]"
-    (trainData, valData)
   }
 
 }

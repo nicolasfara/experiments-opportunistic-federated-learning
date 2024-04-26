@@ -36,7 +36,8 @@ class PhenomenaDistribution[P <: Position[P]](
 
   lazy val dataByPositions: Map[P, Dataset] = {
     phenomenaAreas.zipWithIndex.flatMap {
-      case ((startPoint, endPoint), areaIndex) =>
+      case ((startPoint, endPoint), rawIndex) =>
+        def areaIndex: Int = if(rawIndex >= areas) areas - 1 else rawIndex
         val positionsWithinArea =
           computeSubAreas(startPoint, endPoint, samplesPerArea).zipWithIndex
         val totalDataPerPoint =

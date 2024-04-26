@@ -12,7 +12,7 @@ variables:
     default: 7
   areas: &areas
     type: ArbitraryVariable
-    parameters: [2, [2, 4]]
+    parameters: [5, [2, 4]]
   dataShuffle: &dataShuffle
     type: ArbitraryVariable
     parameters: [true, [true, false]]
@@ -28,7 +28,12 @@ variables:
     formula: longSideNodes * shortSideNodes
   samplePerArea: &samplePerArea
     formula: 4
-
+  epochs: &epochs
+    type: ArbitraryVariable
+    parameters: [ 2, [ 2 ] ]
+  batchSize: &batchSize
+    type: ArbitraryVariable
+    parameters: [ 64, [ 64, 128 ] ]
 seeds:
   scenario: *seed
   simulation: *seed
@@ -78,6 +83,10 @@ deployments:
   contents:
     - molecule: Seed
       concentration: *seed
+    - molecule: BatchSize
+      concentration: *batchSize
+    - molecule: Epochs
+      concentration: *epochs
   programs: *gradient
 
 terminate:
