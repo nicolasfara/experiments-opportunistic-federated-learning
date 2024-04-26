@@ -1,3 +1,32 @@
+## [1.6.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.5.0...1.6.0) (2024-04-26)
+
+
+### Features
+
+* using layers for phenomena distribution ([931d06e](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/931d06e88697210da6a956369fd45725f05bc7a2))
+
+
+### Dependency updates
+
+* **deps:** update alchemist to v33.1.0 ([df654a1](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/df654a1c0cbddcf4371ecfd74a830b42583e0edf))
+
+
+### Bug Fixes
+
+* **baseline:** fix time distributions ([778243e](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/778243eda663bfd4c4424c9f031a18af5c62efd7))
+
+
+### Build and continuous integration
+
+* **deps:** update actions/checkout action to v4.1.4 ([b9404e8](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/b9404e8dd075803746cc4bb2af07b1cc49c4165f))
+* **deps:** update actions/download-artifact action to v4.1.7 ([be60faa](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/be60faa38db629e54a5188299436f50de1ca0c62))
+* **deps:** update danysk/build-check-deploy-gradle-action action to v2.4.17 ([f526353](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/f526353da6cb7028074ae3d8d3e2024102286512))
+
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.5.0 [skip ci] ([a07e4f0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/commit/a07e4f0c544cbc4d65bc3b685d255064caab2532))
+
 ## [1.5.0](https://github.com/nicolasfara/experiments-2024-ACSOS-opportunistic-federated-learning/compare/1.4.1...1.5.0) (2024-04-24)
 
 
