@@ -26,14 +26,16 @@ variables:
     formula: 8
   totalNodes: &totalNodes
     formula: longSideNodes * shortSideNodes
+  samplePerArea: &samplePerArea
+    formula: 4
 
 seeds:
   scenario: *seed
   simulation: *seed
 
 network-model:
-  type: ConnectWithinDistance
-  parameters: [1.5]
+  type: ConnectWithinDistanceAndPhenomena
+  parameters: [1.5, 1]
 
 _gradient: &gradient
   - time-distribution:
@@ -45,15 +47,20 @@ _gradient: &gradient
         parameters: [it.unibo.scafi.BaselineClient, *retentionTime]
   - program: send
 
+layers:
+  - type: PhenomenaDistribution
+    parameters: [0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed]
+    molecule: Phenomena
+
 environment:
   type: Continuous2DEnvironment
   parameters: [ ]
   global-programs:
-    - time-distribution:
-        type: Trigger
-        parameters: [0]
-      type: DataDistributionReaction
-      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
+#    - time-distribution:
+#        type: Trigger
+#        parameters: [0]
+#      type: DataDistributionReaction
+#      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
     - time-distribution:
         type: Trigger
         parameters: [0]

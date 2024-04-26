@@ -1,5 +1,6 @@
 package it.unibo.scafi
 
+import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.scafi.interop.PythonModules.utils
 import me.shadaj.scalapy.py
@@ -10,8 +11,9 @@ class BaselineClient
   with StandardSensors
   with ScafiAlchemistSupport{
 
-  private lazy val data = utils.get_dataset(indexes())
-  private lazy val (trainData, validationData) = splitDataset()
+  private def data = senseEnvData[Dataset](Sensors.phenomena)
+  def trainData = data.trainingData
+  def validationData = data.validationData
   private val epochs = 2
   private val batch_size = 64
 
@@ -22,8 +24,6 @@ class BaselineClient
     logMetrics(trainLoss, validationLoss, validationAccuracy)
     node.put("Model", evolvedModel)
   }
-
-  private def indexes() = node.get[List[Int]](Sensors.data).toPythonProxy
 
   private def seed(): Int = node.get[Double](Sensors.seed).toInt
 
@@ -38,7 +38,7 @@ class BaselineClient
    ): (py.Dynamic, Double) = {
     val localModel = utils.cnn_loader(seed())
     localModel.load_state_dict(model)
-    val result = utils.local_training(localModel, epochs, trainData, batch_size)
+    val result = utils.local_training(localModel, epochs, trainData, batch_size, seed())
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
     (newWeights, trainLoss)
@@ -47,17 +47,10 @@ class BaselineClient
   private def evalModel(model: py.Dynamic): (Double, Double) = {
     val localModel = utils.cnn_loader(seed())
     localModel.load_state_dict(model)
-    val result = utils.evaluate(localModel, validationData, batch_size)
+    val result = utils.evaluate(localModel, validationData, batch_size, seed())
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
     (accuracy, loss)
-  }
-
-  private def splitDataset(): (py.Dynamic, py.Dynamic) = {
-    val datasets = utils.train_val_split(data)
-    val trainData = py"$datasets[0]"
-    val valData = py"$datasets[1]"
-    (trainData, valData)
   }
 
 }
