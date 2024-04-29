@@ -1,5 +1,6 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.configurationcache.extensions.capitalized
+import org.jetbrains.kotlin.util.collectionUtils.listOfNonEmptyScopes
 import java.awt.GraphicsEnvironment
 import java.io.ByteArrayOutputStream
 
@@ -90,11 +91,12 @@ val createVirtualEnv by tasks.register<Exec>("createVirtualEnv") {
 val createPyTorchNetworkFolder by tasks.register<Exec>("createPyTorchNetworkFolder") {
     group = alchemistGroup
     description = "Creates a folder for PyTorch networks"
-    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        true -> commandLine("mkdir", "networks")
-        false -> commandLine("mkdir", "-p", "networks")
+    for (folder in listOf("networks", "networks-baseline")) {
+        when (Os.isFamily(Os.FAMILY_WINDOWS)) {
+            true -> commandLine("mkdir", folder)
+            false -> commandLine("mkdir", "-p", folder)
+        }
     }
-    commandLine("mkdir", "-p", "networks")
 }
 
 val installPythonDependencies by tasks.register<Exec>("installPythonDependencies") {
