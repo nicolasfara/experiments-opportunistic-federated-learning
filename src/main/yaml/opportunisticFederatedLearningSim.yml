@@ -23,7 +23,7 @@ variables:
     parameters: [ 3, [ 3, 5, 10 ] ]
   areas: &areas
     type: ArbitraryVariable
-    parameters: [2, [2, 4]]
+    parameters: [9, [2, 4]]
   batchSize: &batchSize
     type: ArbitraryVariable
     parameters: [ 64, [ 64, 128 ] ]
@@ -33,11 +33,11 @@ variables:
     type: ArbitraryVariable
     parameters: [true, [true, false]]
   dataFraction: &dataFraction
-    formula: 0.1
+    formula: 0.2
   longSideNodes: &longSideNodes
-    formula: 4
+    formula: 7
   shortSideNodes: &shortSideNodes
-    formula: 3
+    formula: 8
   totalNodes: &totalNodes
     formula: longSideNodes * shortSideNodes
   initNN: &initNN
@@ -91,6 +91,8 @@ deployments:
         concentration: *lossThreshold
       - molecule: Epochs
         concentration: *epochs
+      - molecule: Areas
+        concentration: *areas
       - molecule: AggregateLocalEvery
         concentration: *aggregateLocalEvery
       - molecule: BatchSize
