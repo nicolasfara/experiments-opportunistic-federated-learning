@@ -83,7 +83,7 @@ class OpportunisticFederatedLearning
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
       node.put(Sensors.leaderId, leader)
-      node.put(Sensors.model, local)
+      node.put(Sensors.model, sample(local))
       node.put(Sensors.areaId, areaId)
       if (isAggregator) { node.put(models, info) }
       node.put(Sensors.potential, potential)
