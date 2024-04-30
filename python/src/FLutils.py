@@ -83,36 +83,33 @@ def discrepancy(weightsA, weightsB):
     return d / S_t
 
 
-def get_dataset(indexes):
+def get_dataset(indexes, train):
 
     apply_transform = transforms.ToTensor()
 
     train_dataset = datasets.EMNIST(dataset_download_path,
                                    split='letters',
-                                   train=True,
-                                   download=False,
+                                   train=train,
+                                   download=True,
                                    transform=apply_transform)
-
     dataset = DatasetSplit(train_dataset, indexes)
-
     return dataset
 
 
-def dataset_to_nodes_partitioning(areas: int, random_seed: int, shuffling: bool = False, data_fraction = 1.0):
+def dataset_to_nodes_partitioning(areas: int, random_seed: int, shuffling: bool = False, train:bool = True, data_fraction = 1.0):
     np.random.seed(random_seed)  # set seed from Alchemist to make the partitioning deterministic
     apply_transform = transforms.ToTensor()
-
-    train_dataset = datasets.EMNIST(dataset_download_path, split='letters', train=True, download=True, transform=apply_transform)
+    dataset = datasets.EMNIST(dataset_download_path, split='letters', train=train, download=True, transform=apply_transform)
 
     # nodes_per_area = int(nodes_count / areas)
-    dataset_labels_count = len(train_dataset.classes)
+    dataset_labels_count = len(dataset.classes)
     # split_nodes_per_area = np.array_split(np.arange(nodes_count), areas)
     split_classes_per_area = np.array_split(np.arange(dataset_labels_count), areas)
     print(f"split_classes_per_area: {split_classes_per_area}")
     index_mapping = {}  # area_id -> list((record_id, label))
 
     for index, classes in enumerate(split_classes_per_area):
-        records_per_class = [(index, lab) for index, (_, lab) in enumerate(train_dataset) if lab in classes]
+        records_per_class = [(index, lab) for index, (_, lab) in enumerate(dataset) if lab in classes]
         # intra-class shuffling
         if shuffling:
             np.random.shuffle(records_per_class)

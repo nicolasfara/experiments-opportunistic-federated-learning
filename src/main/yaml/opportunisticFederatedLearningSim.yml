@@ -78,8 +78,12 @@ _gradient: &gradient
 
 layers:
   - type: PhenomenaDistribution
-    parameters: [ 0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed ]
+    parameters: [ 0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed, true]
     molecule: Phenomena
+
+#  - type: PhenomenaDistribution
+#    parameters: [ 0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed, false]
+#    molecule: TestSetPhenomena
 
 deployments:
   - type: Grid

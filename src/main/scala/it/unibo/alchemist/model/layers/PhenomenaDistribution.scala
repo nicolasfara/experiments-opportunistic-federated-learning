@@ -15,7 +15,8 @@ class PhenomenaDistribution[P <: Position[P]](
     private val samplesPerArea: Int,
     private val shuffle: Boolean = true,
     private val dataFraction: Double = 1.0,
-    private val seed: Int
+    private val seed: Int,
+    private val train: Boolean
 ) extends Layer[Dataset, P] {
 
   private lazy val phenomenaAreas: List[(P, P)] =
@@ -30,7 +31,7 @@ class PhenomenaDistribution[P <: Position[P]](
     */
   private lazy val splitLabelsAndIndices: Map[Int, List[(Int, Int)]] = {
     PythonModules.utils
-      .dataset_to_nodes_partitioning(areas, seed, shuffle, dataFraction)
+      .dataset_to_nodes_partitioning(areas, seed, shuffle, train, dataFraction)
       .as[Map[Int, List[(Int, Int)]]]
   }
 
@@ -47,7 +48,7 @@ class PhenomenaDistribution[P <: Position[P]](
         positionsWithinArea.map { case (position, index) =>
           val data = dataPerArea(index).map(_._1)
           val split = PythonModules.utils.train_val_split(
-            PythonModules.utils.get_dataset(data.toPythonProxy),
+            PythonModules.utils.get_dataset(data.toPythonProxy, train),
             seed
           )
           center(position) -> Dataset(
