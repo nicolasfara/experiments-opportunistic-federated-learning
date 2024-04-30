@@ -131,6 +131,11 @@ def cnn_loader(seed):
     model.load_state_dict(torch.load(f'networks/initial_model_seed_{seed}'))
     return model
 
+def nn_from_weights(weights):
+    model = CNNMnist()
+    model.load_state_dict(weights)
+    return model
+
 def local_training(model, epochs, data, batch_size, seed):
     torch.manual_seed(seed)
     criterion = nn.NLLLoss()
