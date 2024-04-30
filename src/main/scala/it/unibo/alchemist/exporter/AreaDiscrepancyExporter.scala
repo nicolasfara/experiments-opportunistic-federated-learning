@@ -55,7 +55,7 @@ class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
       val nodeModel = node.get[py.Dynamic](Sensors.model)
       val otherModel = other.get[py.Dynamic](Sensors.model)
       utils
-        .discrepancy(nodeModel.state_dict(), otherModel.state_dict())
+        .discrepancy(nodeModel, otherModel)
         .as[Double]
     }
   }
