@@ -6,9 +6,9 @@ import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.model.{Environment, Node, Position, Time}
 import it.unibo.scafi.Sensors
 import it.unibo.scafi.interop.PythonModules.utils
+import it.unibo.alchemist.exporter.TestDataExporter
 import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.PyQuote
-
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 class DistributedTestSetEvaluation[P <: Position[P]] extends OutputMonitor[Any, P] {
@@ -37,7 +37,7 @@ class DistributedTestSetEvaluation[P <: Position[P]] extends OutputMonitor[Any, 
           (weights, data.trainingData)
         })
         .map { case (w, d) => evaluate(w, d) }
-    accuracies.foreach(println(_))
+    TestDataExporter.CSVExport(accuracies, "data/test-accuracy")
   }
 
   private def nodes(environment: Environment[Any, P]): List[Node[Any]] =
