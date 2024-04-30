@@ -1,16 +1,17 @@
-package it.unibo.alchemist.model
+package it.unibo.alchemist.model.monitors
 
 import it.unibo.alchemist.boundary.OutputMonitor
 import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.molecules.SimpleMolecule
+import it.unibo.alchemist.model.{Environment, Node, Position, Time}
 import it.unibo.scafi.Sensors
-import me.shadaj.scalapy.py
-
-import scala.jdk.CollectionConverters.IteratorHasAsScala
 import it.unibo.scafi.interop.PythonModules.utils
+import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.PyQuote
 
-class TestSetEvaluation[P <: Position[P]] extends OutputMonitor[Any, P] {
+import scala.jdk.CollectionConverters.IteratorHasAsScala
+
+class DistributedTestSetEvaluation[P <: Position[P]] extends OutputMonitor[Any, P] {
 
   private val batch_size = 64
   private val seed = 1

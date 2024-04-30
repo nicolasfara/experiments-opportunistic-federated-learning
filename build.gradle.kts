@@ -180,7 +180,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                    monitors: 
                         - type: SwingGUI
                           parameters: { graphics: effects/${it.nameWithoutExtension}.json }
-                        - type: it.unibo.alchemist.model.TestSetEvaluation
+                        - type: it.unibo.alchemist.model.monitors.DistributedTestSetEvaluation
                 """.trimIndent(),
                 "--override",
                 "launcher: { parameters: { batch: [], autoStart: false } }",
