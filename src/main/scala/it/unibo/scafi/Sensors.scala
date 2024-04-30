@@ -10,6 +10,7 @@ object Sensors {
   val epochs = "Epochs"
   val aggregateLocalEvery = "AggregateLocalEvery"
   val phenomena = "Phenomena"
+  val testsetPhenomena = "TestSetPhenomena"
   val areaId = "AreaId"
 
   val model = "Model"
