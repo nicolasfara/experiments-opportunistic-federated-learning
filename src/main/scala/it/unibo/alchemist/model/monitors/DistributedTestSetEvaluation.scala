@@ -5,16 +5,10 @@ import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.model.{Environment, Node, Position, Time}
 import it.unibo.scafi.Sensors
-import it.unibo.scafi.interop.PythonModules.utils
 import it.unibo.alchemist.exporter.TestDataExporter
 import me.shadaj.scalapy.py
-import me.shadaj.scalapy.py.PyQuote
-import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-class DistributedTestSetEvaluation[P <: Position[P]] extends OutputMonitor[Any, P] {
-
-  private val batch_size = 64
-  private val seed = 1
+class DistributedTestSetEvaluation[P <: Position[P]] extends TestSetEvaluation[P] {
 
   override def finished(
       environment: Environment[Any, P],
@@ -38,16 +32,6 @@ class DistributedTestSetEvaluation[P <: Position[P]] extends OutputMonitor[Any, 
         })
         .map { case (w, d) => evaluate(w, d) }
     TestDataExporter.CSVExport(accuracies, "data/test-accuracy")
-  }
-
-  private def nodes(environment: Environment[Any, P]): List[Node[Any]] =
-    environment.getNodes.iterator().asScala.toList
-
-  private def evaluate(weights: py.Dynamic, data: py.Dynamic): Double = {
-    val model = utils.nn_from_weights(weights)
-    val result = utils.evaluate(model, data, batch_size, seed)
-    val accuracy = py"$result[0]".as[Double]
-    accuracy
   }
 
 }
