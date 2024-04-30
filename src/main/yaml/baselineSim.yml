@@ -54,18 +54,13 @@ _gradient: &gradient
 
 layers:
   - type: PhenomenaDistribution
-    parameters: [0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed]
+    parameters: [0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed, true]
     molecule: Phenomena
 
 environment:
   type: Continuous2DEnvironment
   parameters: [ ]
   global-programs:
-#    - time-distribution:
-#        type: Trigger
-#        parameters: [0]
-#      type: DataDistributionReaction
-#      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
     - time-distribution:
         type: Trigger
         parameters: [0]
@@ -91,7 +86,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 100
+  parameters: 30
 
 export:
   - type: CSVExporter
