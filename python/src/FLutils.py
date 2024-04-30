@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import DataLoader, Dataset, random_split
 
-dataset_download_path = "../../build/dataset"
+dataset_download_path = "build/dataset"
 
 class CNNMnist(nn.Module):
 
