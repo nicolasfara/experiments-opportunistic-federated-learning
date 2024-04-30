@@ -22,7 +22,7 @@ class BaselineClient
     val (evolvedModel, trainLoss) = localTraining(m)
     val (validationAccuracy, validationLoss) = evalModel(evolvedModel)
     logMetrics(trainLoss, validationLoss, validationAccuracy)
-    node.put("Model", evolvedModel)
+    node.put(Sensors.model, evolvedModel)
   }
 
   private def seed(): Int = node.get[Double](Sensors.seed).toInt
