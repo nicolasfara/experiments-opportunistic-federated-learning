@@ -83,7 +83,7 @@ def discrepancy(weightsA, weightsB):
     return d / S_t
 
 
-def get_dataset(indexes, train):
+def get_dataset(indexes, train, split=True):
 
     apply_transform = transforms.ToTensor()
 
@@ -92,7 +92,11 @@ def get_dataset(indexes, train):
                                    train=train,
                                    download=True,
                                    transform=apply_transform)
-    dataset = DatasetSplit(train_dataset, indexes)
+
+    if split:
+        dataset = DatasetSplit(train_dataset, indexes)
+    else:
+        dataset = train_dataset
     return dataset
 
 
