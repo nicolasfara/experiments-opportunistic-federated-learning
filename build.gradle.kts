@@ -176,7 +176,12 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
         val graphic by basetask("run${capitalizedName}Graphic") {
             args(
                 "--override",
-                "monitors: { type: SwingGUI, parameters: { graphics: effects/${it.nameWithoutExtension}.json } }",
+                """
+                   monitors: 
+                        - type: SwingGUI
+                          parameters: { graphics: effects/${it.nameWithoutExtension}.json }
+                        - type: it.unibo.alchemist.model.TestSetEvaluation
+                """.trimIndent(),
                 "--override",
                 "launcher: { parameters: { batch: [], autoStart: false } }",
             )
