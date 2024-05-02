@@ -57,6 +57,10 @@ layers:
     parameters: [0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, *dataFraction, *seed, true]
     molecule: Phenomena
 
+monitors:
+  - type: it.unibo.alchemist.model.monitors.CentralizedTestSetEvaluation
+    parameters: [*seed, *epochs, *areas, *dataShuffle]
+
 environment:
   type: Continuous2DEnvironment
   parameters: [ ]
@@ -86,7 +90,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 30
+  parameters: 40
 
 export:
   - type: CSVExporter

@@ -8,7 +8,14 @@ import it.unibo.scafi.Sensors
 import it.unibo.alchemist.exporter.TestDataExporter
 import me.shadaj.scalapy.py
 
-class DistributedTestSetEvaluation[P <: Position[P]] extends TestSetEvaluation[P] {
+class DistributedTestSetEvaluation[P <: Position[P]](
+    seed: Double,
+    epochs: Int,
+    aggregateLocalEvery: Int,
+    areas: Int,
+    dataShuffle: Boolean,
+    lossThreshold: Double)
+  extends TestSetEvaluation[P](seed, epochs, areas, dataShuffle){
 
   override def finished(
       environment: Environment[Any, P],
@@ -31,7 +38,11 @@ class DistributedTestSetEvaluation[P <: Position[P]] extends TestSetEvaluation[P
           (weights, data.trainingData)
         })
         .map { case (w, d) => evaluate(w, d) }
-    TestDataExporter.CSVExport(accuracies, "data/test-accuracy")
+    TestDataExporter.CSVExport(accuracies,
+      s"data/test_accuracy_seed-${seed}_epochs-${epochs}" +
+        s"_aggregateLocalEvery-${aggregateLocalEvery}_areas-${areas}" +
+        s"_batchSize-${batch_size}_dataShuffle-${dataShuffle}" +
+        s"_lossThreshold-${lossThreshold}")
   }
 
 }

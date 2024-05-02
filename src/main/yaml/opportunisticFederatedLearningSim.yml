@@ -66,15 +66,9 @@ _gradient: &gradient
         parameters: [it.unibo.scafi.OpportunisticFederatedLearning, *retentionTime]
   - program: send
 
-#environment:
-#  type: Continuous2DEnvironment
-#  parameters: [ ]
-#  global-programs:
-#    - time-distribution:
-#        type: Trigger
-#        parameters: [ 0 ]
-#      type: DataDistributionReaction
-#      parameters: [*seed, *areas, *dataShuffle, *dataFraction]
+monitors:
+  - type: it.unibo.alchemist.model.monitors.DistributedTestSetEvaluation
+    parameters: [*seed, *epochs, *aggregateLocalEvery, *areas, *dataShuffle, *lossThreshold]
 
 layers:
   - type: PhenomenaDistribution
@@ -104,7 +98,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 80
+  parameters: 50
 
 export:
   - type: CSVExporter
