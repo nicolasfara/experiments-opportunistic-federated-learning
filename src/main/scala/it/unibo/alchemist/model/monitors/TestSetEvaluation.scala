@@ -7,11 +7,8 @@ import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.PyQuote
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-class TestSetEvaluation [P <: Position[P]](
-  seed: Double,
-  epochs: Int,
-  areas: Int,
-  dataShuffle: Boolean) extends OutputMonitor[Any, P] {
+class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int, dataShuffle: Boolean)
+    extends OutputMonitor[Any, P] {
 
   protected val batch_size = 64
 
@@ -23,6 +20,19 @@ class TestSetEvaluation [P <: Position[P]](
     val result = utils.evaluate(model, data, batch_size, seed)
     val accuracy = py"$result[0]".as[Double]
     accuracy
+  }
+
+  def cleanPythonObjects(): Unit = {
+    val gc = py.module("gc")
+    try {
+      val pythonObjects = py"list($gc.get_objects())".as[Seq[py.Dynamic]]
+      for (elem <- pythonObjects) {
+        py"del $elem"
+      }
+      gc.collect()
+    } catch {
+      case e: Exception => println(e)
+    }
   }
 
 }

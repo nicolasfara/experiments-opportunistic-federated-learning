@@ -7,15 +7,15 @@ _constants:
 variables:
   seed: &seed
     min: 0
-    max: 10
+    max: 9
     step: 1
-    default: 7
+    default: 1
   areas: &areas
     type: ArbitraryVariable
-    parameters: [5, [2, 4]]
+    parameters: [9, [9, 5, 3]]
   dataShuffle: &dataShuffle
-    type: ArbitraryVariable
-    parameters: [true, [true, false]]
+    formula: >
+      true
   dataFraction: &dataFraction
     formula: 0.2
   clientFraction: &clientFraction
@@ -27,20 +27,19 @@ variables:
   totalNodes: &totalNodes
     formula: longSideNodes * shortSideNodes
   samplePerArea: &samplePerArea
-    formula: 4
+    formula: if(areas == 9) 9 else if(areas == 5) 15 else 25
+    language: scala
   epochs: &epochs
-    type: ArbitraryVariable
-    parameters: [ 2, [ 2 ] ]
+    formula: 2
   batchSize: &batchSize
-    type: ArbitraryVariable
-    parameters: [ 64, [ 64, 128 ] ]
+    formula: 64
 seeds:
   scenario: *seed
   simulation: *seed
 
 network-model:
-  type: ConnectWithinDistanceAndPhenomena
-  parameters: [1.5, 1]
+  type: ConnectWithinDistance
+  parameters: [1.5]
 
 _gradient: &gradient
   - time-distribution:

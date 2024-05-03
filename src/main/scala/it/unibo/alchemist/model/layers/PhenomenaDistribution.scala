@@ -26,8 +26,7 @@ class PhenomenaDistribution[P <: Position[P]](
       areas
     )
 
-  /** The key is the ID of the phenomena area, matching the [samplesPerArea]
-    * size
+  /** The key is the ID of the phenomena area, matching the [samplesPerArea] size
     */
   private lazy val splitLabelsAndIndices: Map[Int, List[(Int, Int)]] = {
     PythonModules.utils
@@ -36,27 +35,26 @@ class PhenomenaDistribution[P <: Position[P]](
   }
 
   lazy val dataByPositions: Map[P, Dataset] = {
-    phenomenaAreas.zipWithIndex.flatMap {
-      case ((startPoint, endPoint), rawIndex) =>
-        def areaIndex: Int = if(rawIndex >= areas) areas - 1 else rawIndex
-        val positionsWithinArea =
-          computeSubAreas(startPoint, endPoint, samplesPerArea).zipWithIndex
-        val totalDataPerPoint =
-          splitLabelsAndIndices(areaIndex).size / samplesPerArea
-        val dataPerArea =
-          splitLabelsAndIndices(areaIndex).grouped(totalDataPerPoint).toList
-        positionsWithinArea.map { case (position, index) =>
-          val data = dataPerArea(index).map(_._1)
-          val split = PythonModules.utils.train_val_split(
-            PythonModules.utils.get_dataset(data.toPythonProxy, train),
-            seed
-          )
-          center(position) -> Dataset(
-            areaIndex,
-            py"${split}[0]",
-            py"${split}[1]"
-          )
-        }
+    phenomenaAreas.zipWithIndex.flatMap { case ((startPoint, endPoint), rawIndex) =>
+      def areaIndex: Int = if (rawIndex >= areas) areas - 1 else rawIndex
+      val positionsWithinArea =
+        computeSubAreas(startPoint, endPoint, samplesPerArea).zipWithIndex
+      val totalDataPerPoint =
+        splitLabelsAndIndices(areaIndex).size / samplesPerArea
+      val dataPerArea =
+        splitLabelsAndIndices(areaIndex).grouped(totalDataPerPoint).toList
+      positionsWithinArea.map { case (position, index) =>
+        val data = dataPerArea(index).map(_._1)
+        val split = PythonModules.utils.train_val_split(
+          PythonModules.utils.get_dataset(data.toPythonProxy, train),
+          seed
+        )
+        center(position) -> Dataset(
+          areaIndex,
+          py"${split}[0]",
+          py"${split}[1]"
+        )
+      }
     }.toMap
   }
 

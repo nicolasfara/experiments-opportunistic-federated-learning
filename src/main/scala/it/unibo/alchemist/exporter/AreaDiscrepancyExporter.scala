@@ -10,10 +10,9 @@ import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager
 import it.unibo.scafi.Sensors
 import it.unibo.scafi.interop.PythonModules.utils
 import me.shadaj.scalapy.py
-class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
+class AreaDiscrepancyExporter extends AbstractDoubleExporter {
 
-  override def getColumnNames: util.List[String] =
-    (0 until areas).map(i => s"AreaDiscrepancy$i").toList.asJava
+  override def getColumnNames: util.List[String] = util.List.of("Discrepancy") // todo
 
   override def extractData[T](
       environment: Environment[T, _],
@@ -33,13 +32,14 @@ class AreaDiscrepancyExporter(areas: Int) extends AbstractDoubleExporter {
           .map(node => discrepancy(firstNode, node))
           .sum / nodes.size
       }
-
-    areasWithMeanDiscrepancy.zipWithIndex
-      .map({ case ((_, discrepancy), i) =>
-        s"AreaDiscrepancy$i" -> discrepancy.asInstanceOf[java.lang.Double]
-      })
-      .toMap
-      .asJava
+    util.Map.of(
+      "Discrepancy",
+      if (areasWithMeanDiscrepancy.nonEmpty) {
+        areasWithMeanDiscrepancy.values.sum / areasWithMeanDiscrepancy.size
+      } else {
+        Double.NaN
+      }
+    )
   }
 
   def discrepancy[T](

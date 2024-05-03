@@ -93,27 +93,31 @@ val createVirtualEnv by tasks.register<Exec>("createVirtualEnv") {
 val createPyTorchNetworkFolder by tasks.register<Exec>("createPyTorchNetworkFolder") {
     group = alchemistGroup
     description = "Creates a folder for PyTorch networks"
-    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        true -> commandLine("mkdir", "networks")
-        false -> commandLine("mkdir", "-p", "networks")
-    }
     commandLine("mkdir", "-p", "networks")
 }
 
 val createPyTorchNetworkBaselineFolder by tasks.register<Exec>("createPyTorchNetworkBaselineFolder") {
     group = alchemistGroup
     description = "Creates a folder for PyTorch networks"
-    when (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        true -> commandLine("mkdir", "networks-baseline")
-        false -> commandLine("mkdir", "-p", "networks-baseline")
-    }
     commandLine("mkdir", "-p", "networks-baseline")
+}
+
+val createDataFolderForTest by tasks.register<Exec>("createDataFolderForTest") {
+    group = alchemistGroup
+    description = "Creates a folder for data"
+    commandLine("mkdir", "-p", "data-test")
+}
+
+val createDataFolderForTestBaseline by tasks.register<Exec>("createDataFolderForTestBaseline") {
+    group = alchemistGroup
+    description = "Creates a folder for data"
+    commandLine("mkdir", "-p", "data-test-baseline")
 }
 
 val installPythonDependencies by tasks.register<Exec>("installPythonDependencies") {
     group = alchemistGroup
     description = "Installs Python dependencies"
-    dependsOn(createVirtualEnv, createPyTorchNetworkFolder, createPyTorchNetworkBaselineFolder)
+    dependsOn(createVirtualEnv, createPyTorchNetworkFolder, createPyTorchNetworkBaselineFolder, createDataFolderForTest, createDataFolderForTestBaseline)
     when (Os.isFamily(Os.FAMILY_WINDOWS)) {
         true -> commandLine("$pythonVirtualEnvName\\Scripts\\pip", "install", "-r", "requirements.txt")
         false -> commandLine("$pythonVirtualEnvName/bin/pip", "install", "-r", "requirements.txt")
@@ -199,17 +203,22 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             description = "Launches batch experiments for $capitalizedName"
             maxHeapSize = "${minOf(heap.toInt(), Runtime.getRuntime().availableProcessors() * taskSize)}m"
             File("data").mkdirs()
+            val batch = if(capitalizedName.contains("Baseline")) {
+                "seed, areas"
+            } else {
+                "seed, areas, lossThreshold"
+            }
             args("--override",
                 """
-                    launcher: {
-                        parameters: {
-                            batch: [ seed ],
-                            showProgress: true,
-                            autoStart: true,
-                            parallelism: 1,
-                        }
+                launcher: {
+                    parameters: {
+                        batch: [ $batch ],
+                        showProgress: true,
+                        autoStart: true,
+                        parallelism: 1,
                     }
-                """.trimIndent())
+                }
+            """.trimIndent())
         }
         runAllBatch.dependsOn(batch)
     }
