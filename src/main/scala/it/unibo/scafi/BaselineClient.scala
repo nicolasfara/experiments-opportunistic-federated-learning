@@ -18,7 +18,7 @@ class BaselineClient
   private lazy val batch_size = sense[Int](Sensors.batchSize)
 
   override def main(): Any = {
-    val m = node.get[py.Dynamic]("Model")
+    val m = node.get[py.Dynamic](Sensors.model)
     val (evolvedModel, trainLoss) = localTraining(m)
     val (validationAccuracy, validationLoss) = evalModel(evolvedModel)
     logMetrics(trainLoss, validationLoss, validationAccuracy)

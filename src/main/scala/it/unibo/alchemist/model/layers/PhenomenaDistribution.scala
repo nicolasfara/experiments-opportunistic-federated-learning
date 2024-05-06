@@ -58,6 +58,11 @@ class PhenomenaDistribution[P <: Position[P]](
     }.toMap
   }
 
+  def cleanAll(): Unit =
+    dataByPositions.values.foreach { data =>
+      data.trainingData.del()
+      data.validationData.del()
+    }
   private def computeSubAreas(start: P, end: P, areas: Int): List[(P, P)] = {
     val rows = math.sqrt(areas).toInt
     val cols = (areas + rows - 1) / rows

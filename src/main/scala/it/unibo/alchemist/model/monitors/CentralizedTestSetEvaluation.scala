@@ -22,7 +22,7 @@ class CentralizedTestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, 
       s"data-test-baseline/test_accuracy_seed-${seed}_epochs-${epochs}" +
         s"_areas-${areas}_batchSize-${batch_size}_dataShuffle-${dataShuffle}"
     )
-    cleanPythonObjects()
+    cleanPythonObjects(environment)
   }
 
 }

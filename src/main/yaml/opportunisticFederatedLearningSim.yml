@@ -6,10 +6,10 @@ _constants:
 
 variables:
   seed: &seed
-    min: 3
+    min: 0
     max: 9
     step: 1
-    default: 1
+    default: 0
   epochs: &epochs
     type: ArbitraryVariable
     parameters: [2, [2]]
@@ -92,7 +92,7 @@ deployments:
 
 terminate:
   type: AfterTime
-  parameters: 40
+  parameters: 40.0
 
 export:
   - type: CSVExporter

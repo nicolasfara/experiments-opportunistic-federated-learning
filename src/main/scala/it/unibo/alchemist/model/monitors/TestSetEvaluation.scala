@@ -1,10 +1,14 @@
 package it.unibo.alchemist.model.monitors
 
 import it.unibo.alchemist.boundary.OutputMonitor
+import it.unibo.alchemist.model.layers.PhenomenaDistribution
+import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.alchemist.model.{Environment, Node, Position}
+import it.unibo.scafi.Sensors
 import it.unibo.scafi.interop.PythonModules.utils
 import me.shadaj.scalapy.py
 import me.shadaj.scalapy.py.PyQuote
+
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int, dataShuffle: Boolean)
@@ -22,17 +26,21 @@ class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int,
     accuracy
   }
 
-  def cleanPythonObjects(): Unit = {
+  def cleanPythonObjects(environment: Environment[_, P]): Unit = {
     val gc = py.module("gc")
-    val pythonObjects = py"list($gc.get_objects())".as[Seq[py.Dynamic]]
-    for (elem <- pythonObjects) {
-      try {
-        py"del $elem"
-      } catch {
-        case e: Exception => println(e)
+
+    try {
+      environment
+        .getLayer(new SimpleMolecule(Sensors.phenomena))
+        .ifPresent(layer => layer.asInstanceOf[PhenomenaDistribution[P]].cleanAll())
+      val nodes = environment.getNodes.iterator().asScala.toList
+      nodes.foreach { node =>
+        node.getConcentration(new SimpleMolecule(Sensors.model)).asInstanceOf[py.Dynamic].del()
       }
+      gc.collect()
+      Runtime.getRuntime.gc()
+    } catch {
+      case e: Throwable => println(e)
     }
-    gc.collect()
-    Runtime.getRuntime.gc()
   }
 }

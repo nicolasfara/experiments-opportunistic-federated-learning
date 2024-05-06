@@ -44,7 +44,7 @@ class DistributedTestSetEvaluation[P <: Position[P]](
         s"_batchSize-${batch_size}_dataShuffle-${dataShuffle}" +
         s"_lossThreshold-${lossThreshold}"
     )
-    cleanPythonObjects()
+    cleanPythonObjects(environment)
   }
 
 }
