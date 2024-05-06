@@ -24,16 +24,15 @@ class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int,
 
   def cleanPythonObjects(): Unit = {
     val gc = py.module("gc")
-    try {
-      val pythonObjects = py"list($gc.get_objects())".as[Seq[py.Dynamic]]
-      for (elem <- pythonObjects) {
+    val pythonObjects = py"list($gc.get_objects())".as[Seq[py.Dynamic]]
+    for (elem <- pythonObjects) {
+      try {
         py"del $elem"
+      } catch {
+        case e: Exception => println(e)
       }
-      gc.collect()
-    } catch {
-      case e: Exception => println(e)
     }
+    gc.collect()
     Runtime.getRuntime.gc()
   }
-
 }

@@ -44,17 +44,7 @@ class DistributedTestSetEvaluation[P <: Position[P]](
         s"_batchSize-${batch_size}_dataShuffle-${dataShuffle}" +
         s"_lossThreshold-${lossThreshold}"
     )
-    val gc = py.module("gc")
-    try {
-      val pythonObjects = py"list($gc.get_objects())".as[Seq[py.Dynamic]]
-      for (elem <- pythonObjects) {
-        py"del $elem"
-      }
-      gc.collect()
-    } catch {
-      case e: Exception => println(e)
-    }
-    Runtime.getRuntime.gc()
+    cleanPythonObjects()
   }
 
 }

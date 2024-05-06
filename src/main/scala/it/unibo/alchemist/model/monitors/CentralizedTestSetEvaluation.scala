@@ -22,16 +22,7 @@ class CentralizedTestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, 
       s"data-test-baseline/test_accuracy_seed-${seed}_epochs-${epochs}" +
         s"_areas-${areas}_batchSize-${batch_size}_dataShuffle-${dataShuffle}"
     )
-    val gc = py.module("gc")
-    try {
-      val pythonObjects = py"list($gc.get_objects())".as[Seq[py.Dynamic]]
-      for (elem <- pythonObjects) {
-        py"del $elem"
-      }
-      gc.collect()
-    } catch {
-      case e: Exception => println(e)
-    }
+    cleanPythonObjects()
   }
 
 }
