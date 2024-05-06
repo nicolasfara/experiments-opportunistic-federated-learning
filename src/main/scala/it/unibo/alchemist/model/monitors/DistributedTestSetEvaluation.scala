@@ -54,6 +54,7 @@ class DistributedTestSetEvaluation[P <: Position[P]](
     } catch {
       case e: Exception => println(e)
     }
+    Runtime.getRuntime.gc()
   }
 
 }

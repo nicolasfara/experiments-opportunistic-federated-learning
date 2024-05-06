@@ -163,6 +163,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                     true -> "-Dscalapy.python.programname=$pythonVirtualEnvName\\Scripts\\python"
                     false -> "-Dscalapy.python.programname=$pythonVirtualEnvName/bin/python"
                 },
+                "-Xmx${1024}m"
                 //"-Dscalapy.python.library=python3.10"
             )
             javaLauncher.set(

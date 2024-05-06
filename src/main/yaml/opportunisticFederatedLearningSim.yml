@@ -6,7 +6,7 @@ _constants:
 
 variables:
   seed: &seed
-    min: 0
+    min: 3
     max: 9
     step: 1
     default: 1

@@ -33,6 +33,7 @@ class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int,
     } catch {
       case e: Exception => println(e)
     }
+    Runtime.getRuntime.gc()
   }
 
 }
