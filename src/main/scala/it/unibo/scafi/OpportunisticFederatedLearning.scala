@@ -59,7 +59,7 @@ class OpportunisticFederatedLearning
 
   override def main(): Any = {
     rep((localModel, localModel, 1)) { case (local, global, tick) =>
-      val metric = actualMetric(global)
+      val metric = actualMetric(local)
       val isAggregator = S(
         threshold,
         metric = metric
@@ -69,6 +69,7 @@ class OpportunisticFederatedLearning
         evalModel(evolvedModel, validationData)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
       val potential = classicGradient(isAggregator, metric)
+      //flexGradient(0.5, 0.9, 1)(isAggregator, metric)
       val sender = G_along(potential, metric, mid(), (_: ID) => nbr(mid()))
       val leader = broadcast(isAggregator, mid(), metric)
       val info = CWithSenderField[List[py.Dynamic]](

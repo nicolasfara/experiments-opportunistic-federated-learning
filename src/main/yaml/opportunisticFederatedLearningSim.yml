@@ -11,8 +11,7 @@ variables:
     step: 1
     default: 0
   epochs: &epochs
-    type: ArbitraryVariable
-    parameters: [2, [2]]
+    formula: 2
   aggregateLocalEvery: &aggregateLocalEvery
     formula: 3
   areas: &areas
