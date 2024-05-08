@@ -3,6 +3,7 @@ package it.unibo.alchemist.exporter
 import it.unibo.Utils.{EnvironmentOps, RichNode}
 import it.unibo.alchemist.boundary.extractors.AbstractDoubleExporter
 import it.unibo.alchemist.model.{Actionable, Environment, Time}
+import it.unibo.scafi.Sensors
 import it.unibo.scafi.Sensors.{leaderId, validationAccuracy}
 
 import java.{lang, util}
@@ -21,7 +22,7 @@ class AverageAccuracyExporter extends AbstractDoubleExporter {
     val nodes = environment.getNodesAsScala
     val averageAccuracyPerArea = nodes
       .map(node => node.manager)
-      .map(node => node.get[Int](leaderId) -> node.getOrElse[Double](validationAccuracy, Double.NaN))
+      .map(node => node.get[Int](Sensors.areaId) -> node.getOrElse[Double](validationAccuracy, Double.NaN))
       .groupBy(_._1)
       .map { case (_, accuracies) => accuracies.map(_._2).sum / accuracies.size }
 

@@ -23,12 +23,12 @@ class AverageLossExporter extends AbstractDoubleExporter {
       .map(node => new SimpleNodeManager[T](node))
       .map(node =>
         (
-          node.get[Int](Sensors.leaderId),
+          node.get[Int](Sensors.areaId),
           node.getOrElse(Sensors.trainLoss, Double.NaN),
           node.getOrElse(Sensors.validationLoss, Double.NaN)
         )
       )
-      .groupBy { case (leaderId, _, _) => leaderId }
+      .groupBy { case (areaId, _, _) => areaId }
       .map { case (id, losses) => id -> losses.map(e => (e._2, e._3)) }
       .map { case (id, losses) => id -> meanLosses(losses) }
 
@@ -38,9 +38,9 @@ class AverageLossExporter extends AbstractDoubleExporter {
 
     util.Map.of(
       "AverageLossTraining",
-      avgLossTraining / averagePerArea.size,
+      avgLossTraining,
       "AverageLossValidation",
-      avgLossValidation / averagePerArea.size
+      avgLossValidation
     )
   }
 
