@@ -3,7 +3,7 @@ package it.unibo.scafi
 object Sensors {
   val leaderId = "Leader"
   val isAggregator = "IsAggregator"
-
+  val sharedModel = "sharedModel"
   val seed = "Seed"
   val data = "Data"
   val batchSize = "BatchSize"

@@ -36,6 +36,8 @@ class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int,
       val nodes = environment.getNodes.iterator().asScala.toList
       nodes.foreach { node =>
         node.getConcentration(new SimpleMolecule(Sensors.model)).asInstanceOf[py.Dynamic].del()
+        node.getConcentration(new SimpleMolecule(Sensors.sharedModel)).asInstanceOf[py.Dynamic].del()
+
       }
       gc.collect()
       Runtime.getRuntime.gc()

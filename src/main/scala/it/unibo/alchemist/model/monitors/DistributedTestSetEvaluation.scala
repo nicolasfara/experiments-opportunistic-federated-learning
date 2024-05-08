@@ -29,7 +29,7 @@ class DistributedTestSetEvaluation[P <: Position[P]](
       nodes(environment)
         .map(node => {
           val weights = node
-            .getConcentration(new SimpleMolecule(Sensors.model))
+            .getConcentration(new SimpleMolecule(Sensors.sharedModel))
             .asInstanceOf[py.Dynamic]
           val data = layer
             .getValue(environment.getPosition(node))
