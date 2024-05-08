@@ -48,5 +48,5 @@ if __name__ == '__main__':
         plt.title(f'Test accuracy when loss threshold {th}')
         plt.ylim(0, 1)
         ax.yaxis.grid(True)
-        plt.savefig(f'{output_directory}/test-accuracy-comparison-threshold-{th}.png', dpi=500)
+        plt.savefig(f'{output_directory}/test-accuracy-comparison-threshold-{th}.pdf', dpi=500)
         plt.close()
