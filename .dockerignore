@@ -6,6 +6,8 @@
 build/
 charts/
 data/
+env/
+networks/
 release.config.js
 renovate.json
 package-lock.json
