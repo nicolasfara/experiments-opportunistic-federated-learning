@@ -27,4 +27,6 @@ object Sensors {
   val sender = "Sender"
   val potential = "Potential"
 
+  val movable = "Movable"
+  val sameLeader = "SameLeader"
 }

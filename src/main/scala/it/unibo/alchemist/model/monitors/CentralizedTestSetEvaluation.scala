@@ -9,7 +9,7 @@ import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import me.shadaj.scalapy.py
 
 class CentralizedTestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int, dataShuffle: Boolean)
-    extends TestSetEvaluation[P](seed, epochs, areas, dataShuffle) {
+    extends TestSetEvaluation[P](seed) {
 
   override def finished(environment: Environment[Any, P], time: Time, step: Long): Unit = {
     println("Starting evaluation...")

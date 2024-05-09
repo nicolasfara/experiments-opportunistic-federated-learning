@@ -9,7 +9,7 @@ variables:
     min: 0
     max: 9
     step: 1
-    default: 0
+    default: 6
   epochs: &epochs
     formula: 2
   aggregateLocalEvery: &aggregateLocalEvery
@@ -26,7 +26,7 @@ variables:
     formula: >
       true
   dataFraction: &dataFraction
-    formula: 0.01
+    formula: 0.2
   longSideNodes: &longSideNodes
     formula: 7
   shortSideNodes: &shortSideNodes
@@ -40,7 +40,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   lossThreshold: &lossThreshold
     type: ArbitraryVariable
-    parameters: [80.0, [20.0, 40.0, 80.0]]
+    parameters: [20.0, [20.0, 40.0, 80.0]]
 seeds:
   scenario: *seed
   simulation: *seed
@@ -60,7 +60,9 @@ _gradient: &gradient
   - program: send
 
 _movement: &movement
-  - time-distribution: 1
+  - time-distribution:
+      type: DiracComb
+      parameters: [ 1, 1 ]
     type: Event
     actions:
       - type: MoveInAreas
@@ -70,8 +72,8 @@ _movement: &movement
           - [0, 1, 2, 5, 4, 3, 6, 7, 8]
 
 monitors:
-  - type: it.unibo.alchemist.model.monitors.DistributedTestSetEvaluation
-    parameters: [*seed, *epochs, *aggregateLocalEvery, *areas, *dataShuffle, *lossThreshold]
+  - type: it.unibo.alchemist.model.monitors.JustClean
+    parameters: [*seed]
 
 layers:
   - type: PhenomenaDistribution
@@ -113,6 +115,8 @@ deployments:
         concentration: *aggregateLocalEvery
       - molecule: BatchSize
         concentration: *batchSize
+      - molecule: Movable
+        concentration: true
     programs:
       - *movement
       - *gradient
@@ -124,23 +128,12 @@ export:
   - type: CSVExporter
     parameters:
       fileNameRoot: "experiment"
-      interval: 1.0
+      interval: 1
       exportPath: "data-movement"
     data:
       - time
       - type: AreaCountExporter
       - type: AreaDiscrepancyExporter
         parameters: [ ]
-      - type: AreaCorrectnessExporter
-      - type: AverageLossExporter
-      - type: AverageAccuracyExporter
-      - molecule: TrainLoss
-        aggregators: [min, max, mean, variance]
-        value-filter: onlyFinite
-        precision: 3
-      - molecule: ValidationLoss
-        aggregators: [min, max, mean, variance]
-        value-filter: onlyfinite
-      - molecule: ValidationAccuracy
-        aggregators: [min, max, mean, variance]
-        value-filter: onlyfinite
+      - type: MoveInformationExporter
+        parameters: [ ]

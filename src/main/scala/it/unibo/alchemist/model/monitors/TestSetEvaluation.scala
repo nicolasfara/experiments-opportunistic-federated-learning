@@ -11,8 +11,7 @@ import me.shadaj.scalapy.py.PyQuote
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-class TestSetEvaluation[P <: Position[P]](seed: Double, epochs: Int, areas: Int, dataShuffle: Boolean)
-    extends OutputMonitor[Any, P] {
+class TestSetEvaluation[P <: Position[P]](seed: Double) extends OutputMonitor[Any, P] {
 
   protected val batch_size = 64
 

@@ -16,7 +16,7 @@ class DistributedTestSetEvaluation[P <: Position[P]](
     areas: Int,
     dataShuffle: Boolean,
     lossThreshold: Double
-) extends TestSetEvaluation[P](seed, epochs, areas, dataShuffle) {
+) extends TestSetEvaluation[P](seed) {
 
   override def finished(
       environment: Environment[Any, P],

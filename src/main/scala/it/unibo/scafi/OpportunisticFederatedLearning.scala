@@ -8,25 +8,22 @@ import Sensors._
 import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
 
-/** Metriche loss media per ogni area / set di etichette (nico) --
-  * validation/test loss [X] loss globale (nico) [X] accuracy media per ogni
-  * area (nico) (di validation) [X] accuracy globale (dom) divergenza
-  * (all'interno dell'area) -- gianlu corretteza della aree (i nodi che hanno lo
-  * stesso dataset sono nella stessa area) -- nico [X] convergenza (specifico
-  * sul movimento) -- io accuracy + loss su test -- dom
+/** Metriche loss media per ogni area / set di etichette (nico) -- validation/test loss [X] loss globale (nico) [X]
+  * accuracy media per ogni area (nico) (di validation) [X] accuracy globale (dom) divergenza (all'interno dell'area) --
+  * gianlu corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico [X] convergenza
+  * (specifico sul movimento) -- io accuracy + loss su test -- dom
   *
-  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss
-  * per ogni nodo (davide) posizionamento del dato in base alla posizione
-  * spaziale (idea: fare una griglia di nodi che non eseguono il programma ma
-  * servono solo per posizionare i dati e poi usi 1-nn search per trovare i
-  * dati) -- nico usare più aree (io) usare aree fuzzy (k=2) -- gianlu movimento
-  * di un nodo -- gianlu con più nodi (???) -- gianlu
+  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss per ogni nodo (davide) posizionamento del
+  * dato in base alla posizione spaziale (idea: fare una griglia di nodi che non eseguono il programma ma servono solo
+  * per posizionare i dati e poi usi 1-nn search per trovare i dati) -- nico usare più aree (io) usare aree fuzzy (k=2)
+  * -- gianlu movimento di un nodo -- gianlu con più nodi (???) -- gianlu
   */
 class OpportunisticFederatedLearning
     extends AggregateProgram
     with StandardSensors
     with ScafiAlchemistSupport
     with FieldUtils
+    with TimeUtils
     with BuildingBlocks {
 
   private lazy val localModel = utils.cnn_loader(seed())
@@ -69,7 +66,7 @@ class OpportunisticFederatedLearning
         evalModel(evolvedModel, validationData)
       val neighbourhoodMetric = excludingSelf.reifyField(metric())
       val potential = classicGradient(isAggregator, metric)
-      //flexGradient(0.5, 0.9, 1)(isAggregator, metric)
+      // flexGradient(0.5, 0.9, 1)(isAggregator, metric)
       val sender = G_along(potential, metric, mid(), (_: ID) => nbr(mid()))
       val leader = broadcast(isAggregator, mid(), metric)
       val info = CWithSenderField[List[py.Dynamic]](
@@ -83,6 +80,10 @@ class OpportunisticFederatedLearning
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
+      val (same, _) = rep((false, leader)) { case (same, oldId) =>
+        (oldId == leader) -> leader
+      }
+      node.put(Sensors.sameLeader, same)
       node.put(Sensors.leaderId, leader)
       node.put(Sensors.model, sample(local))
       node.put(Sensors.sharedModel, sample(sharedModel))

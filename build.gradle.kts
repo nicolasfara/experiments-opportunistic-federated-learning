@@ -206,6 +206,8 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             File("data").mkdirs()
             val batch = if(capitalizedName.contains("Baseline")) {
                 "seed, areas"
+            } else if (capitalizedName.contains("Movement")) {
+                "seed"
             } else {
                 "seed, areas, lossThreshold"
             }
