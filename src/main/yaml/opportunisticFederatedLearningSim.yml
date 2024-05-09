@@ -40,7 +40,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   lossThreshold: &lossThreshold
     type: ArbitraryVariable
-    parameters: [80.0, [20.0, 40.0, 80.0]]
+    parameters: [20.0, [20.0, 40.0, 80.0]]
 seeds:
   scenario: *seed
   simulation: *seed
@@ -70,7 +70,9 @@ layers:
   - type: PhenomenaDistribution
     parameters: [ 0, 0, *longSideNodes, *shortSideNodes, *areas, *samplePerArea, *dataShuffle, 1, *seed, false]
     molecule: TestSetPhenomena
-
+  - type: IdPhenomenaLayer
+    parameters: [Phenomena]
+    molecule: IdPhenomena
 deployments:
   - type: Grid
     parameters: [0, 0, *longSideNodes, *shortSideNodes, 1, 1, *skewness, *skewness]
