@@ -7,6 +7,7 @@ import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import Sensors._
 import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
+import it.unibo.scafi.ColorRandomUtils.colorFromPalette
 
 /** Metriche loss media per ogni area / set di etichette (nico) -- validation/test loss [X] loss globale (nico) [X]
   * accuracy media per ogni area (nico) (di validation) [X] accuracy globale (dom) divergenza (all'interno dell'area) --
@@ -89,6 +90,7 @@ class OpportunisticFederatedLearning
       node.put(Sensors.leaderId, leader)
       node.put(Sensors.model, sample(local))
       node.put(Sensors.sharedModel, sample(sharedModel))
+      node.put("Federation", leader % 9)
       node.put(Sensors.areaId, areaId)
       if (isAggregator) { node.put(models, info) }
       node.put(Sensors.potential, potential)
@@ -240,38 +242,6 @@ class OpportunisticFederatedLearning
       d < (other + precision) && other < (d + precision)
   }
 
-  override def flexGradient(
-      epsilon: Double = DEFAULT_FLEX_CHANGE_TOLERANCE_EPSILON,
-      delta: Double = DEFAULT_FLEX_DELTA,
-      communicationRadius: Double = DEFAULT_FLEX_DELTA
-  )(source: Boolean, metric: Metric = nbrRange): Double =
-    share(Double.PositiveInfinity) { case (local, query) =>
-      import Builtins.Bounded._ // for min/maximizing over tuplesù
-      def distance = Math.max(metric(), delta * communicationRadius)
-      val maxLocalSlope: (Double, ID, Double, Double) =
-        maxHood {
-          ((local - query()) / distance, nbr { mid }, query(), metric())
-        }
-      val constraint = minHoodPlus { (query() + distance) }
-      mux(source) { 0.0 } {
-        if (Math.max(communicationRadius, 2 * constraint) < local) {
-          constraint
-        } else if (maxLocalSlope._1 > 1 + epsilon) {
-          maxLocalSlope._3 + (1 + epsilon) * Math.max(
-            delta * communicationRadius,
-            maxLocalSlope._4
-          )
-        } else if (maxLocalSlope._1 < 1 - epsilon) {
-          maxLocalSlope._3 + (1 - epsilon) * Math.max(
-            delta * communicationRadius,
-            maxLocalSlope._4
-          )
-        } else {
-          local
-        }
-      }
-    }
-
   import BoundedMessage._
   import BoundedMessage.BoundedMsg
   import Builtins.Bounded
@@ -308,4 +278,13 @@ private object BoundedMessage {
         .collectFirst { case x if x != 0 => x }
         .getOrElse(0)
   }
+}
+
+object ColorRandomUtils {
+  // write 10 very different colors
+  val paletteOfDifferentColorsHue = List(
+    0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f
+  )
+  def colorFromPalette(index: Int): Float =
+    paletteOfDifferentColorsHue(index % paletteOfDifferentColorsHue.size)
 }
