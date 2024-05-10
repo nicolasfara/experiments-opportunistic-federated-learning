@@ -419,6 +419,7 @@ if __name__ == '__main__':
                             )
                             ax.set_xlim(minTime, maxTime)
                             ax.legend()
+                            ax.yaxis.grid(True)
                             fig.tight_layout()
                             by_time_output_directory = f'{output_directory}/{basedir}/{comparison_variable}'
                             Path(by_time_output_directory).mkdir(parents=True, exist_ok=True)
