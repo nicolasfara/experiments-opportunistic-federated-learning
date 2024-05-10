@@ -57,10 +57,12 @@ class OpportunisticFederatedLearning
   override def main(): Any = {
     rep((localModel, localModel, 1)) { case (local, global, tick) =>
       val metric = actualMetric(local)
-      val isAggregator = S(
+      val leader = SWithMinimisingShare(
         threshold,
-        metric = metric
+        metric = metric,
+        symBreaker = mid()
       )
+      val isAggregator = leader == mid()
       val (evolvedModel, trainLoss) = localTraining(local, trainData)
       val (validationAccuracy, validationLoss) =
         evalModel(evolvedModel, validationData)
@@ -68,7 +70,6 @@ class OpportunisticFederatedLearning
       val potential = classicGradient(isAggregator, metric)
       // flexGradient(0.5, 0.9, 1)(isAggregator, metric)
       val sender = G_along(potential, metric, mid(), (_: ID) => nbr(mid()))
-      val leader = broadcast(isAggregator, mid(), metric)
       val info = CWithSenderField[List[py.Dynamic]](
         _ ++ _,
         List(evolvedModel),
@@ -78,6 +79,7 @@ class OpportunisticFederatedLearning
       val areaId = data.areaId
       val aggregatedModel = averageWeights(info, List.fill(info.length)(1.0))
       val sharedModel = broadcast(isAggregator, aggregatedModel, metric)
+
       if (isAggregator) { snapshot(sharedModel, mid(), tick) }
       // Actuations
       val (same, _) = rep((false, leader)) { case (same, oldId) =>
@@ -269,4 +271,41 @@ class OpportunisticFederatedLearning
         }
       }
     }
+
+  import BoundedMessage._
+  import BoundedMessage.BoundedMsg
+  import Builtins.Bounded
+
+  // cf. https://arxiv.org/pdf/1711.08297.pdf
+  def SWithMinimisingShare(grain: Double, symBreaker: Int, metric: Metric): ID = {
+    def fMP(value: Candidacy): Candidacy = value match {
+      case Candidacy(_, dd, id) if id == mid() || dd >= grain => BoundedMessage.BoundedMsg.top
+      case m                                                  => m
+    }
+
+    val loc = Candidacy(symBreaker, 0.0, mid())
+    share[Candidacy](loc) { case (_, nbrc) =>
+      minHoodPlusLoc(loc) {
+        val nbrCandidacy = nbrc()
+        fMP(nbrCandidacy.copy(distance = nbrCandidacy.distance + metric()))
+      }
+    }.leaderId
+  }
+}
+import Builtins.Bounded
+private case class Candidacy(symBreaker: Int, distance: Double, leaderId: Int)
+
+private object BoundedMessage {
+  implicit object BoundedMsg extends Bounded[Candidacy] {
+    override def bottom: Candidacy =
+      Candidacy(implicitly[Bounded[Int]].bottom, implicitly[Bounded[Double]].bottom, implicitly[Bounded[ID]].bottom)
+
+    override def top: Candidacy =
+      Candidacy(implicitly[Bounded[Int]].top, implicitly[Bounded[Double]].top, implicitly[Bounded[ID]].top)
+
+    override def compare(a: Candidacy, b: Candidacy): Int =
+      List(a.symBreaker.compareTo(b.symBreaker), a.distance.compareTo(b.distance), a.leaderId.compareTo(b.leaderId))
+        .collectFirst { case x if x != 0 => x }
+        .getOrElse(0)
+  }
 }

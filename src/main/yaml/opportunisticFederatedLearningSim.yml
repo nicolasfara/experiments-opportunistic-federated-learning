@@ -9,7 +9,7 @@ variables:
     min: 0
     max: 9
     step: 1
-    default: 0
+    default: 9
   epochs: &epochs
     formula: 2
   aggregateLocalEvery: &aggregateLocalEvery
@@ -40,7 +40,7 @@ variables:
       utils.init_cnn(seed.asInstanceOf[Double].toInt)
   lossThreshold: &lossThreshold
     type: ArbitraryVariable
-    parameters: [20.0, [20.0, 40.0, 80.0]]
+    parameters: [80.0, [20.0, 40.0, 80.0]]
 seeds:
   scenario: *seed
   simulation: *seed
