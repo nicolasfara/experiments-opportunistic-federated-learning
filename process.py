@@ -3,6 +3,7 @@ import xarray as xr
 import re
 from pathlib import Path
 import collections
+import seaborn as sns
 
 def distance(val, ref):
     return abs(ref - val)
@@ -360,17 +361,21 @@ if __name__ == '__main__':
         error_alpha=0.2,
         figure_size=(6, 4)
     ):
+        plt.set_cmap('viridis')
         fig = plt.figure(figsize = figure_size)
         ax = fig.add_subplot(1, 1, 1)
         ax.set_title(title)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+        import matplotlib.cm as cm
+        l = len(ydata.items())
+        colors_v = cm.viridis(np.linspace(0, 1, l))
 #        ax.set_ylim(0)
 #        ax.set_xlim(min(xdata), max(xdata))
         index = 0
         for (label, (data, error)) in ydata.items():
 #            print(f'plotting {data}\nagainst {xdata}')
-            lines = ax.plot(xdata, data, label=label, color=colors(index / (len(ydata) - 1)) if colors else None, linewidth=linewidth)
+            lines = ax.plot(xdata, data, label=label, color=colors_v[index], linewidth=linewidth)
             index += 1
             if error is not None:
                 last_color = lines[-1].get_color()
@@ -419,11 +424,11 @@ if __name__ == '__main__':
                                 figname = figname.replace(symbol, '_')
                             fig.savefig(f'{by_time_output_directory}/{figname}.pdf')
                             plt.close(fig)
-    for experiment in experiments:
-        print(experiment)
-        print(means)
-        current_experiment_means = means[experiment]
-        current_experiment_errors = stdevs[experiment]
-        generate_all_charts(current_experiment_means, current_experiment_errors, basedir = f'{experiment}/all')
+    # for experiment in experiments:
+    #     print(experiment)
+    #     print(means)
+    #     current_experiment_means = means[experiment]
+    #     current_experiment_errors = stdevs[experiment]
+    #     generate_all_charts(current_experiment_means, current_experiment_errors, basedir = f'{experiment}/all')
         
-# Custom charting
+   
