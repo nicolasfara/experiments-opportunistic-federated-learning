@@ -188,7 +188,7 @@ if __name__ == '__main__':
     experiments = ['experiment']
     floatPrecision = '{: 0.3f}'
     # Number of time samples 
-    timeSamples = 20
+    timeSamples = 30
     # time management
     minTime = 0
     maxTime = 40
@@ -347,14 +347,42 @@ if __name__ == '__main__':
     import matplotlib
     import matplotlib.pyplot as plt
     import matplotlib.cm as cmx
-    matplotlib.rcParams.update({'axes.titlesize': 15})
-    matplotlib.rcParams.update({'axes.labelsize': 15})
+    matplotlib.rcParams.update({'axes.titlesize': 18})
+    matplotlib.rcParams.update({'axes.labelsize': 18})
+    plt.rcParams.update({
+    "text.usetex": True
+    })
+
+    plt.rc('text.latex', preamble=r'\usepackage{amsmath,amssymb,amsfonts}')
     
     def beautify_title(title):
         splitted = title.split(']')
         if (len(splitted) > 1):
             return splitted[0].split('[')[0] + splitted[1]
         return title
+
+    def to_metric_symbol(metric):
+        symbol = ''
+        if 'TrainLoss' in metric:
+            symbol = '$NLL - Train$'
+        elif 'ValidationLoss' in metric:
+            symbol = '$NLL - Validation$'
+        elif 'ValidationAccuracy' in metric:
+            symbol = '$Accuracy - Validation$'
+        elif 'AreaCount' in metric:
+            symbol = '$|F|$'
+        elif 'AreaCorrectness' in metric:
+            symbol = '$\Diamond$'
+        else:
+            symbol = metric
+        return symbol
+    
+
+    def to_symbol_title(title):
+        if 'lossThreshold' in title:
+            return f'$\sigma$ = {title[-2:]}'
+        else:
+            return title
 
 
     def make_line_chart(
@@ -371,9 +399,9 @@ if __name__ == '__main__':
         plt.set_cmap('viridis')
         fig = plt.figure(figsize = figure_size)
         ax = fig.add_subplot(1, 1, 1)
-        ax.set_title(title.split(' ')[-1])
+        ax.set_title(to_symbol_title(title.split(' ')[-1]))
         ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel.split('[')[0])
+        ax.set_ylabel(to_metric_symbol(ylabel.split('[')[0]))
         colors_v = sns.color_palette("colorblind", len(ydata.items())) 
         index = 0
         for (label, (data, error)) in ydata.items():
@@ -420,6 +448,7 @@ if __name__ == '__main__':
                             ax.set_xlim(minTime, maxTime)
                             ax.legend()
                             ax.yaxis.grid(True)
+                            ax.xaxis.grid(True)
                             fig.tight_layout()
                             by_time_output_directory = f'{output_directory}/{basedir}/{comparison_variable}'
                             Path(by_time_output_directory).mkdir(parents=True, exist_ok=True)
