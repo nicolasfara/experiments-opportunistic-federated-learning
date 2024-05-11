@@ -49,24 +49,3 @@ so that the charts can be regenerated without having to run the experiment again
 To regenerate the charts, run `docker compose run --no-deps charts`.
 Alternatively, follow the steps or the "reproduce natively" section,
 starting after the part describing how to re-launch the simulations.
-
-## Experiments description
-The idea of the experiments is to verify the correct creation of opportunistic zones that follow the data distribution.
-### Data
-#### Classification
-Here we plan to use some standard dataset for classification, such as:
-- https://www.nist.gov/itl/products-and-services/emnist-dataset
-- https://github.com/zalandoresearch/fashion-mnist
-How? We can distribute the data following a Dirichlet distribution (TODO: verify if there are other distributions).
-Idea: we can start with ~30 devices and then using more for extended minst
-#### Regression
-Here we can simulate several time series distribution (e.g., sinusoidal, linear, etc.) and distribute them among the devices.
-
-### Metrics (for the experiments results)
-- Loss/accuracy
-- shape of the zones
-
-TODO
-- bring the leader election based on a metric
-- distribute the data following some spatial distribution
-- implement federated learning algorithm
