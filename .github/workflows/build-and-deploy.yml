@@ -45,7 +45,7 @@ jobs:
       - name: Upgrade pip
         run: pip install --upgrade pip --user
       - name: Install latex for fonts in charts
-        run: sudo apt install texlive texlive-latex-extra texlive-fonts-recommended dvipng
+        run: sudo apt install texlive-latex-extra texlive-fonts-recommended dvipng cm-super
       - name: Install requirements
         run: pip install -r requirements.txt --user
       - name: Prepare charts folder
