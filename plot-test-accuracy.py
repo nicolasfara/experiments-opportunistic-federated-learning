@@ -22,21 +22,25 @@ def get_data(directory, algorithm):
         df = df._append({'Test accuracy': acc, 'Areas': area, 'Algorithm': algorithm}, ignore_index=True)
     return df
 
-
 if __name__ == '__main__':
 
     output_directory = 'charts/test'
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-    matplotlib.rcParams.update({'axes.titlesize': 12})
-    matplotlib.rcParams.update({'axes.labelsize': 10})
+    matplotlib.rcParams.update({'axes.titlesize': 20})
+    matplotlib.rcParams.update({'axes.labelsize': 20})
+    plt.rcParams.update({
+    "text.usetex": True
+    })
+    plt.rc('text.latex', preamble=r'\usepackage{amsmath,amssymb,amsfonts}')
+
 
     data_baseline = get_data('data-test-baseline/*.csv', 'Baseline')
 
     data_self_fl = {}
 
-    for th in [20.0, 40.0, 80.0]:
-        d = get_data(f'data-test/*lossThreshold-{th}.csv', 'Self-FL')
+    for th in [20, 40, 80]:
+        d = get_data(f'data-test/*lossThreshold-{th}.0.csv', 'Self-FL')
         data_self_fl[th] = d
 
     for th in data_self_fl.keys():
@@ -45,9 +49,10 @@ if __name__ == '__main__':
         sns.set_palette('colorblind')
         ax = sns.boxplot(data=data_comparison, x='Areas', y='Test accuracy', hue='Algorithm')
         sns.move_legend(ax, 'lower left')
-        plt.title(f'Test accuracy when loss threshold {th}')
+        plt.title(f'$ \sigma = {th}$')
+        plt.ylabel('$Accuracy - Test$')
         plt.ylim(0, 1)
         ax.yaxis.grid(True)
         ax.xaxis.grid(True)
-        plt.savefig(f'{output_directory}/test-accuracy-comparison-threshold-{th}.pdf', dpi=500)
+        plt.savefig(f'{output_directory}/test-accuracy-comparison-threshold-{th}.0.pdf', dpi=500)
         plt.close()

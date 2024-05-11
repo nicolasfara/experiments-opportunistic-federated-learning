@@ -56,16 +56,18 @@ def plot_metric(data, metric, yname=None):
         plt.ylabel(yname)
     else:
         plt.ylabel(metric)
-    plt.grid(True)
     ax.yaxis.grid(True)
+    ax.xaxis.grid(True)
     plt.savefig(f'charts/movement/{metric}-mean.pdf', dpi=500)
     plt.close()
 
 if __name__ == '__main__':
 
-    matplotlib.rcParams.update({'axes.titlesize': 18})
-    matplotlib.rcParams.update({'axes.labelsize': 18})
-
+    matplotlib.rcParams.update({'axes.titlesize': 30})
+    matplotlib.rcParams.update({'axes.labelsize': 30})
+    plt.rcParams.update({
+        "text.usetex": True
+        })
     data_dir = 'data-movement'
     file_names = glob.glob(f'{data_dir}/*.csv')
     for file in file_names:
@@ -82,8 +84,8 @@ if __name__ == '__main__':
     mean_and_std = avg_std_dataframes(dfs)
     mean_df = avg_dataframes(dfs)
 
-    plot_metric(mean_and_std, 'ValidationLoss', "NNL -- Validation")
-    plot_metric(mean_df, 'SameLeader', "SL")
-    plot_metric(mean_and_std, 'AreaCount', "|A|")
+    plot_metric(mean_and_std, 'ValidationLoss', "$NLL - Validation$")
+    plot_metric(mean_df, 'SameLeader', "$SL$")
+    plot_metric(mean_and_std, 'AreaCount', "$|A|$")
 
 
