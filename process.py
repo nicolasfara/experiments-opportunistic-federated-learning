@@ -372,7 +372,7 @@ if __name__ == '__main__':
         elif 'AreaCount' in metric:
             symbol = '$|F|$'
         elif 'AreaCorrectness' in metric:
-            symbol = '$\Diamond$'
+            symbol = r'$\Diamond$'
         else:
             symbol = metric
         return symbol
@@ -380,7 +380,7 @@ if __name__ == '__main__':
 
     def to_symbol_title(title):
         if 'lossThreshold' in title:
-            return f'$\sigma$ = {title[-2:]}'
+            return r'$\sigma$ = {}'.format(title[-2:])
         else:
             return title
 
