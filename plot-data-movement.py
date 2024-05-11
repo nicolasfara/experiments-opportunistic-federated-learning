@@ -48,7 +48,7 @@ def avg_std_dataframes(dfs):
     return pd.concat([mean_df, minus_deviation, plus_deviation])
 
 def plot_metric(data, metric, yname=None):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 8))
     colors_v = sns.color_palette("colorblind", 10) 
     ax = sns.lineplot(data=data, x='time', y=metric, color=colors_v[0])
     plt.xlabel('time')
@@ -65,9 +65,9 @@ if __name__ == '__main__':
 
     matplotlib.rcParams.update({'axes.titlesize': 30})
     matplotlib.rcParams.update({'axes.labelsize': 30})
-    plt.rcParams.update({
-        "text.usetex": True
-        })
+    matplotlib.rcParams.update({'xtick.labelsize': 25})
+    matplotlib.rcParams.update({'ytick.labelsize': 25})
+    plt.rcParams.update({"text.usetex": True})
     data_dir = 'data-movement'
     file_names = glob.glob(f'{data_dir}/*.csv')
     for file in file_names:

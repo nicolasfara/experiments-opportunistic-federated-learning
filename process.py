@@ -349,6 +349,8 @@ if __name__ == '__main__':
     import matplotlib.cm as cmx
     matplotlib.rcParams.update({'axes.titlesize': 18})
     matplotlib.rcParams.update({'axes.labelsize': 18})
+    matplotlib.rcParams.update({'xtick.labelsize': 15})
+    matplotlib.rcParams.update({'ytick.labelsize': 15})
     plt.rcParams.update({
     "text.usetex": True
     })

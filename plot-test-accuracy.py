@@ -27,8 +27,10 @@ if __name__ == '__main__':
     output_directory = 'charts/test'
     Path(output_directory).mkdir(parents=True, exist_ok=True)
 
-    matplotlib.rcParams.update({'axes.titlesize': 20})
-    matplotlib.rcParams.update({'axes.labelsize': 20})
+    matplotlib.rcParams.update({'axes.titlesize': 30})
+    matplotlib.rcParams.update({'axes.labelsize': 30})
+    matplotlib.rcParams.update({'xtick.labelsize': 25})
+    matplotlib.rcParams.update({'ytick.labelsize': 25})
     plt.rcParams.update({
     "text.usetex": True
     })
@@ -44,6 +46,7 @@ if __name__ == '__main__':
         data_self_fl[th] = d
 
     for th in data_self_fl.keys():
+        plt.figure(figsize=(12, 8))
         data_comparison = pd.concat([data_baseline, data_self_fl[th]])
         sns.color_palette('colorblind', as_cmap=True)
         sns.set_palette('colorblind')
