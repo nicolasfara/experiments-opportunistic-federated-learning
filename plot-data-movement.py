@@ -34,13 +34,28 @@ def avg_dataframes(dfs):
         mean_df += d 
     mean_df = mean_df / len(dfs)
     return mean_df
+def avg_std_dataframes(dfs):
+    # Calculate the mean DataFrame
+    mean_df = sum(dfs) / len(dfs)
 
-def plot_metric(data, metric):
+    # Calculate the standard deviation DataFrame
+    std_df = pd.concat(dfs).groupby(level=0).std()
+    minus_deviation = mean_df - std_df
+    plus_deviation = mean_df + std_df
+    minus_deviation['time'] = mean_df['time']
+    plus_deviation['time'] = mean_df['time']
+    ## stack the dataframes with the mean in one dataframe
+    return pd.concat([mean_df, minus_deviation, plus_deviation])
+
+def plot_metric(data, metric, yname=None):
     plt.figure(figsize=(10, 6))
     colors_v = sns.color_palette("colorblind", 10) 
     ax = sns.lineplot(data=data, x='time', y=metric, color=colors_v[0])
     plt.xlabel('time')
-    plt.ylabel(metric)
+    if yname:
+        plt.ylabel(yname)
+    else:
+        plt.ylabel(metric)
     plt.grid(True)
     ax.yaxis.grid(True)
     plt.savefig(f'charts/movement/{metric}-mean.pdf', dpi=500)
@@ -64,8 +79,11 @@ if __name__ == '__main__':
         df = pd.read_csv(file_name, sep=' ')
         dfs.append(df)
 
+    mean_and_std = avg_std_dataframes(dfs)
     mean_df = avg_dataframes(dfs)
 
-    plot_metric(mean_df, 'ValidationLoss')
-    plot_metric(mean_df, 'SameLeader')
+    plot_metric(mean_and_std, 'ValidationLoss', "NNL -- Validation")
+    plot_metric(mean_df, 'SameLeader', "SL")
+    plot_metric(mean_and_std, 'AreaCount', "|A|")
+
 
