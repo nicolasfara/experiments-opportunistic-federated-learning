@@ -33,7 +33,9 @@ def avg_dataframes(dfs):
     for d in dfs[1:]:
         mean_df += d 
     mean_df = mean_df / len(dfs)
+    mean_df["SameLeader"] = 1 - mean_df["SameLeader"]
     return mean_df
+
 def avg_std_dataframes(dfs):
     # Calculate the mean DataFrame
     mean_df = sum(dfs) / len(dfs)
@@ -85,7 +87,7 @@ if __name__ == '__main__':
     mean_df = avg_dataframes(dfs)
 
     plot_metric(mean_and_std, 'ValidationLoss', "$NLL - Validation$")
-    plot_metric(mean_df, 'SameLeader', "$SL$")
+    plot_metric(mean_df, 'SameLeader', "$DL$")
     plot_metric(mean_and_std, 'AreaCount', "$|A|$")
 
 
