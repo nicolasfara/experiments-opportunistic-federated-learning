@@ -20,14 +20,6 @@ class DataDistributionReaction[T, P <: Position[P]](
       .dataset_to_nodes_partitioning(nodesCount, areas, seed, dataShuffle, dataFraction)
       .as[Map[Int, (List[Int], Set[Int])]]
 
-    // I'm a dog, however I can't find a better solution to trigger the reconfiguration of the linking rule
-//    environment.getNodes.forEach(n => environment.moveNodeToPosition(n, environment.getPosition(n)))
-
-//    dataDistribution.foreach { case (id, (data, labels)) =>
-//      val node = environment.getNodeByID(id).manager
-//      node.put(Sensors.data, data.asInstanceOf[T])
-//      node.put(Sensors.labels, labels.asInstanceOf[T])
-//    }
   }
 
   override def initializationComplete(

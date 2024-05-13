@@ -7,18 +7,7 @@ import me.shadaj.scalapy.py.{PyQuote, SeqConverters}
 import Sensors._
 import it.unibo.alchemist.model.layers.Dataset
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist
-import it.unibo.scafi.ColorRandomUtils.colorFromPalette
 
-/** Metriche loss media per ogni area / set di etichette (nico) -- validation/test loss [X] loss globale (nico) [X]
-  * accuracy media per ogni area (nico) (di validation) [X] accuracy globale (dom) divergenza (all'interno dell'area) --
-  * gianlu corretteza della aree (i nodi che hanno lo stesso dataset sono nella stessa area) -- nico [X] convergenza
-  * (specifico sul movimento) -- io accuracy + loss su test -- dom
-  *
-  * algoritmo fedarato centrizzato (baseline) -- dom aggiungi validation loss per ogni nodo (davide) posizionamento del
-  * dato in base alla posizione spaziale (idea: fare una griglia di nodi che non eseguono il programma ma servono solo
-  * per posizionare i dati e poi usi 1-nn search per trovare i dati) -- nico usare più aree (io) usare aree fuzzy (k=2)
-  * -- gianlu movimento di un nodo -- gianlu con più nodi (???) -- gianlu
-  */
 class OpportunisticFederatedLearning
     extends AggregateProgram
     with StandardSensors
@@ -27,7 +16,11 @@ class OpportunisticFederatedLearning
     with TimeUtils
     with BuildingBlocks {
 
-  private lazy val localModel = utils.cnn_loader(seed())
+  private lazy val localModel = {
+    val result = utils.cnn_loader(seed)
+    println(result.state_dict())
+    result
+  }
   private def data = senseEnvData[Dataset](Sensors.phenomena)
   def trainData = data.trainingData
   def validationData = data.validationData
@@ -123,10 +116,10 @@ class OpportunisticFederatedLearning
       trainData: py.Dynamic
   ): (py.Dynamic, Double) = {
     val result =
-      utils.local_training(model, epochs, trainData, batch_size, seed())
+      utils.local_training(model, epochs, trainData, batch_size, seed)
     val newWeights = py"$result[0]"
     val trainLoss = py"$result[1]".as[Double]
-    val freshNN = utils.cnn_loader(seed())
+    val freshNN = utils.cnn_loader(seed)
     freshNN.load_state_dict(newWeights)
     (freshNN, trainLoss)
   }
@@ -152,7 +145,7 @@ class OpportunisticFederatedLearning
         models.map(sample).toPythonProxy,
         weights.toPythonProxy
       )
-    val freshNN = utils.cnn_loader(seed())
+    val freshNN = utils.cnn_loader(seed)
     freshNN.load_state_dict(averageWeights)
     freshNN
   }
@@ -161,7 +154,7 @@ class OpportunisticFederatedLearning
       myModel: py.Dynamic,
       validationData: py.Dynamic
   ): (Double, Double) = {
-    val result = utils.evaluate(myModel, validationData, batch_size, seed())
+    val result = utils.evaluate(myModel, validationData, batch_size, seed)
     val accuracy = py"$result[0]".as[Double]
     val loss = py"$result[1]".as[Double]
     (accuracy, loss)
@@ -188,7 +181,7 @@ class OpportunisticFederatedLearning
     )
   }
 
-  private def seed(): Int = node.get[Double](Sensors.seed).toInt
+  private lazy val seed: Int = node.get[Double](Sensors.seed).toInt
 
   private def impulsesEvery(time: Int): Boolean =
     time % aggregateLocalEvery == 0
