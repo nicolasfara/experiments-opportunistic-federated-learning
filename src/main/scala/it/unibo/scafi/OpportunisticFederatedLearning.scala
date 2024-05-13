@@ -16,11 +16,7 @@ class OpportunisticFederatedLearning
     with TimeUtils
     with BuildingBlocks {
 
-  private lazy val localModel = {
-    val result = utils.cnn_loader(seed)
-    println(result.state_dict())
-    result
-  }
+  private lazy val localModel = utils.cnn_loader(seed)
   private def data = senseEnvData[Dataset](Sensors.phenomena)
   def trainData = data.trainingData
   def validationData = data.validationData
@@ -79,6 +75,7 @@ class OpportunisticFederatedLearning
       val (same, _) = rep((false, leader)) { case (same, oldId) =>
         (oldId == leader) -> leader
       }
+      node.put(Sensors.data, py"len(${data.trainingData})")
       node.put(Sensors.sameLeader, same)
       node.put(Sensors.leaderId, leader)
       node.put(Sensors.model, sample(local))
@@ -271,13 +268,4 @@ private object BoundedMessage {
         .collectFirst { case x if x != 0 => x }
         .getOrElse(0)
   }
-}
-
-object ColorRandomUtils {
-  // write 10 very different colors
-  val paletteOfDifferentColorsHue = List(
-    0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f
-  )
-  def colorFromPalette(index: Int): Float =
-    paletteOfDifferentColorsHue(index % paletteOfDifferentColorsHue.size)
 }
