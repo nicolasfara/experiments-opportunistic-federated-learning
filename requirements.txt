@@ -1,6 +1,6 @@
 matplotlib ==3.8.4
 xarray ==2024.3.0
-torch ==2.3.0
+torch ==2.3.1
 torchvision ==0.18.0
 numpy
 pandas
