@@ -19,7 +19,7 @@ jobs:
     - uses: actions/setup-python@v5.1.0
       with:
         python-version: '3.11'
-    - uses: DanySK/build-check-deploy-gradle-action@2.4.17
+    - uses: DanySK/build-check-deploy-gradle-action@2.4.24
       with:
         build-command: true
         check-command: ./gradlew runAllGraphic
